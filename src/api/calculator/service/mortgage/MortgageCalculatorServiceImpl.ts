@@ -2,6 +2,7 @@ import {
 	CalculatorType,
 	CanadaMortgageService,
 	CanadaMortgageRules,
+	CanadaMortgageCalculationInput,
 	CanadaMortgageCalculationResult,
 	FranceMortgageRules,
 	FranceMortgageCalculationResult,
@@ -9,6 +10,10 @@ import {
 	SouthAfricaMortgageService,
 	SouthAfricaMortgageRules,
 	SouthAfricaMortgageOutput,
+	AustraliaMortgageService,
+	AustraliaMortgageRules,
+	AustraliaMortgageOutput,
+	AustraliaMortgageInput,
 } from '@novha/calc-engines';
 
 import { MortgageRequest } from '../../domain/MortgageTypes';
@@ -25,6 +30,8 @@ export class MortgageCalculatorServiceImpl extends BaseCalculatorService impleme
 					return (await this.processSouthAfricaMortgage(data)) as T;
 				case 'fr':
 					return (await this.processFranceMortgage(data)) as T;
+				case 'au':
+					return (await this.processAustraliaMortgage(data)) as T;
 				default:
 					throw new Error(`Unsupported country: ${data.countryCode}`);
 			}
@@ -39,9 +46,27 @@ export class MortgageCalculatorServiceImpl extends BaseCalculatorService impleme
 			data.year,
 			CalculatorType.MORTGAGE,
 		);
+		const { propertyPrice, downPayment, interestRate, amortizationYears, paymentFrequency } = data.details;
+		const validFrequencies: CanadaMortgageCalculationInput['paymentFrequency'][] = [
+			'MONTHLY',
+			'BI_WEEKLY',
+			'ACCELERATED_BI_WEEKLY',
+		];
+		const canadaFrequency: CanadaMortgageCalculationInput['paymentFrequency'] = validFrequencies.includes(
+			paymentFrequency as CanadaMortgageCalculationInput['paymentFrequency'],
+		)
+			? (paymentFrequency as CanadaMortgageCalculationInput['paymentFrequency'])
+			: 'MONTHLY';
+		const canadaInput: CanadaMortgageCalculationInput = {
+			propertyPrice,
+			downPayment,
+			interestRate,
+			amortizationYears,
+			paymentFrequency: canadaFrequency,
+		};
 		const canadaMortgageService = new CanadaMortgageService();
 
-		return canadaMortgageService.calculate(data.details, countryRules);
+		return canadaMortgageService.calculate(canadaInput, countryRules);
 	}
 
 	async processSouthAfricaMortgage(data: MortgageRequest): Promise<SouthAfricaMortgageOutput> {
@@ -95,5 +120,34 @@ export class MortgageCalculatorServiceImpl extends BaseCalculatorService impleme
 		const franceMortgageService = new FranceMortgageService(details, countryRules);
 
 		return franceMortgageService.calculate();
+	}
+
+	async processAustraliaMortgage(data: MortgageRequest): Promise<AustraliaMortgageOutput> {
+		const { propertyPrice, downPayment, interestRate, amortizationYears, paymentFrequency } = data.details;
+
+		const validFrequencies: AustraliaMortgageInput['paymentFrequency'][] = ['MONTHLY', 'FORTNIGHTLY', 'WEEKLY'];
+		const australiaFrequency: AustraliaMortgageInput['paymentFrequency'] = validFrequencies.includes(
+			paymentFrequency as AustraliaMortgageInput['paymentFrequency'],
+		)
+			? (paymentFrequency as AustraliaMortgageInput['paymentFrequency'])
+			: 'MONTHLY';
+
+		const input: AustraliaMortgageInput = {
+			propertyPrice,
+			downPayment,
+			annualInterestRate: interestRate,
+			amortizationYears,
+			paymentFrequency: australiaFrequency,
+		};
+
+		const countryRules = await this.getCountryRules<AustraliaMortgageRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.MORTGAGE,
+		);
+
+		const australiaMortgageService = new AustraliaMortgageService();
+
+		return australiaMortgageService.calculate(input, countryRules);
 	}
 }

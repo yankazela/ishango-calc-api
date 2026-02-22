@@ -4,7 +4,7 @@ export interface MortgageRequest {
 		downPayment: number;
 		interestRate: number;
 		amortizationYears: number;
-		paymentFrequency: 'MONTHLY' | 'BI_WEEKLY' | 'ACCELERATED_BI_WEEKLY';
+		paymentFrequency: 'MONTHLY' | 'BI_WEEKLY' | 'ACCELERATED_BI_WEEKLY' | 'FORTNIGHTLY' | 'WEEKLY';
 		grossMonthlyIncome?: number;
 		netMonthlyIncome?: number;
 		loanDurationYears?: number;

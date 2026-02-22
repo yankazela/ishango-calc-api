@@ -1,0 +1,40 @@
+{
+  "meta": {
+    "id": "ca-on-corporate",
+    "calculator": "corporateIncomeTax",
+    "level": "province",
+    "currency": "cad",
+    "version": "2025.1"
+  },
+  "inputs": [
+    {
+      "name": "taxableIncome",
+      "type": "number",
+      "required": true
+    },
+    {
+      "name": "isSmallBusiness",
+      "type": "boolean",
+      "required": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "provincialTax",
+      "type": "number"
+    }
+  ],
+  "rules": {
+    "regimes": {
+      "general": {
+        "type": "flat",
+        "rate": 0.115
+      },
+      "smallBusiness": {
+        "type": "flat",
+        "rate": 0.032,
+        "maxIncome": 500000
+      }
+    }
+  }
+}

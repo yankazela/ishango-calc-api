@@ -1,0 +1,91 @@
+{
+  "meta": {
+    "id": "france-mortgage-rules",
+    "country": "FR",
+    "region": "NATIONAL",
+    "calculator": "MORTGAGE",
+    "version": "2025.1",
+    "effectiveFrom": "2025-01-01",
+    "effectiveTo": null,
+    "currency": "EUR",
+    "source": [
+      {
+        "name": "Haut Conseil de Stabilité Financière (HCSF)",
+        "url": "https://www.economie.gouv.fr/hcsf"
+      },
+      {
+        "name": "Banque de France",
+        "url": "https://www.banque-france.fr"
+      }
+    ]
+  },
+
+  "inputs": [
+    {
+      "name": "propertyPrice",
+      "type": "number",
+      "required": true,
+      "unit": "EUR"
+    },
+    {
+      "name": "downPayment",
+      "type": "number",
+      "required": true,
+      "unit": "EUR"
+    },
+    {
+      "name": "annualIncome",
+      "type": "number",
+      "required": true,
+      "unit": "EUR"
+    },
+    {
+      "name": "loanDurationYears",
+      "type": "number",
+      "required": true
+    },
+    {
+      "name": "interestRate",
+      "type": "number",
+      "required": true
+    }
+  ],
+
+  "outputs": [
+    { "name": "loanAmount", "type": "number", "unit": "EUR" },
+    { "name": "monthlyPayment", "type": "number", "unit": "EUR" },
+    { "name": "totalInterest", "type": "number", "unit": "EUR" },
+    { "name": "debtRatio", "type": "number" },
+    { "name": "isEligible", "type": "boolean" }
+  ],
+
+  "rules": {
+    "maxDebtRatio": 0.35,
+    "maxLoanDurationYears": 25,
+    "maxLoanDurationNewBuildYears": 27,
+    "minDownPaymentRate": 0.10,
+
+    "firstTimeBuyer": {
+      "enabled": true,
+      "maxDebtRatio": 0.40,
+      "maxLoanDurationYears": 27,
+      "quotaDisclaimer": "Subject to bank quota limits (HCSF 20% rule)",
+      "requiresPrimaryResidence": true
+    },
+
+    "insurance": {
+      "averageRate": 0.003,
+      "includedInDebtRatio": true
+    },
+
+    "fees": {
+      "notaryRateOldProperty": 0.08,
+      "notaryRateNewProperty": 0.025,
+      "bankFeesRate": 0.01
+    },
+
+    "stressTest": {
+      "interestRateBuffer": 0.01
+    }
+  }
+}

@@ -1,0 +1,226 @@
+{
+  "info": {
+    "name": "ishango-calc-api",
+    "description": "Postman collection generated from NestJS controllers. Base URL uses the global prefix /api/v1.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001"
+    }
+  ],
+  "item": [
+    {
+      "name": "Ping",
+      "item": [
+        {
+          "name": "Ping",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/ping",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "ping"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Calculators",
+      "item": [
+        {
+          "name": "List calculators",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calculators/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "calculators", ""]
+            }
+          }
+        },
+        {
+          "name": "Process income tax",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calculators/process-income-tax",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "calculators", "process-income-tax"]
+            }
+          }
+        },
+        {
+          "name": "Process income tax (private)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calculators/process-income-tax/private",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "calculators", "process-income-tax", "private"]
+            }
+          }
+        },
+        {
+          "name": "Process mortgage",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calculators/process-mortgage",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "calculators", "process-mortgage"]
+            }
+          }
+        },
+        {
+          "name": "Process corporate tax",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calculators/process-corporate-tax",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "calculators", "process-corporate-tax"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Countries",
+      "item": [
+        {
+          "name": "List calculator countries",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/countries/calculators/:calculatorTypeName/:year",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "countries", "calculators", ":calculatorTypeName", ":year"],
+              "variable": [
+                { "key": "calculatorTypeName", "value": "income-tax" },
+                { "key": "year", "value": "2024" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Experts",
+      "item": [
+        {
+          "name": "List experts by country and calculator",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/experts/:countryCode/:calculatorType",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "experts", ":countryCode", ":calculatorType"],
+              "variable": [
+                { "key": "countryCode", "value": "CA" },
+                { "key": "calculatorType", "value": "income-tax" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List experts by country",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/experts/:countryCode",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "experts", ":countryCode"],
+              "variable": [
+                { "key": "countryCode", "value": "CA" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Plans",
+      "item": [
+        {
+          "name": "List plans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/plans/:currencyRegionCode",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "plans", ":currencyRegionCode"],
+              "variable": [
+                { "key": "currencyRegionCode", "value": "CA" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subscriptions",
+      "item": [
+        {
+          "name": "Create subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/subscriptions/",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "subscriptions", ""]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

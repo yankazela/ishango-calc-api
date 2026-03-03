@@ -144,7 +144,13 @@ export class ProcessIncomeTaxInputServiceImpl extends BaseCalculatorService impl
 			data.year,
 			CalculatorType.INCOME_TAX,
 		);
-		const australiaIncomeTaxService = new AustraliaIncomeTaxService(data.income, countryRules);
+
+		const australiaIncomeTaxService = new AustraliaIncomeTaxService(
+			data.income,
+			countryRules,
+			data.isResident || true,
+			data.includeMedicareLevy || true,
+		);
 
 		const result = australiaIncomeTaxService.calculateNetIncome();
 

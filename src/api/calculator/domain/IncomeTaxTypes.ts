@@ -8,6 +8,8 @@ export interface IncomeTaxRequest {
 	familyPart?: number;
 	medicalAidMembers?: number;
 	age?: number;
+	includeMedicareLevy?: boolean;
+	isResident?: boolean;
 }
 
 export interface CanadaIncomeTaxValues {

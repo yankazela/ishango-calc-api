@@ -12,6 +12,9 @@ import {
 	AustraliaCorporateTaxInput,
 	AustraliaCorporateTaxService,
 	AustraliaCorporateTaxRules,
+	UKCorporateTaxInput,
+	UKCorporateTaxService,
+	UKCorporateTaxRules,
 } from '@novha/calc-engines';
 import { CorporateTaxRequest, CorporateTaxResponse } from '../../domain/CorporateTaxTypes';
 import { BaseCalculatorService } from '../BaseCalculatorService';
@@ -30,6 +33,8 @@ export class CorporateTaxServiceImpl extends BaseCalculatorService implements Co
 					return this.processSouthAfricaCorporateTax(data) as Promise<T>;
 				case 'au':
 					return this.processAustraliaCorporateTax(data) as Promise<T>;
+				case 'gb':
+					return this.processUKCorporateTax(data) as Promise<T>;
 				default:
 					throw new Error(`Unsupported country: ${data.countryCode}`);
 			}
@@ -124,6 +129,24 @@ export class CorporateTaxServiceImpl extends BaseCalculatorService implements Co
 
 		return {
 			federalTax: australiaService.calculate(),
+		};
+	}
+
+	private async processUKCorporateTax(data: CorporateTaxRequest): Promise<CorporateTaxResponse> {
+		const countryRules = await this.getCountryRules<UKCorporateTaxRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.CORPORATE_TAX,
+		);
+
+		const ukInput: UKCorporateTaxInput = {
+			taxableIncome: data.details.taxableIncome,
+		};
+
+		const ukService = new UKCorporateTaxService(ukInput, countryRules);
+
+		return {
+			federalTax: ukService.calculate(),
 		};
 	}
 }

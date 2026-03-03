@@ -33,7 +33,7 @@ export class CorporateTaxServiceImpl extends BaseCalculatorService implements Co
 					return this.processSouthAfricaCorporateTax(data) as Promise<T>;
 				case 'au':
 					return this.processAustraliaCorporateTax(data) as Promise<T>;
-				case 'gb':
+				case 'uk':
 					return this.processUKCorporateTax(data) as Promise<T>;
 				default:
 					throw new Error(`Unsupported country: ${data.countryCode}`);

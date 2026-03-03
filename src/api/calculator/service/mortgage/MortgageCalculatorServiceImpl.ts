@@ -36,7 +36,7 @@ export class MortgageCalculatorServiceImpl extends BaseCalculatorService impleme
 					return (await this.processFranceMortgage(data)) as T;
 				case 'au':
 					return (await this.processAustraliaMortgage(data)) as T;
-				case 'gb':
+				case 'uk':
 					return (await this.processUKMortgage(data)) as T;
 				default:
 					throw new Error(`Unsupported country: ${data.countryCode}`);

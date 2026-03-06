@@ -4,6 +4,7 @@ import {
 	SouthAfricaCorporateTaxResult,
 	AustraliaCorporateTaxResult,
 	UKCorporateTaxResult,
+	GermanyCorporateTaxResult,
 } from '@novha/calc-engines';
 
 export interface CorporateTaxRequest {
@@ -24,11 +25,13 @@ export interface CorporateTaxResponse {
 		| FranceCorporateTaxResult
 		| SouthAfricaCorporateTaxResult
 		| AustraliaCorporateTaxResult
-		| UKCorporateTaxResult;
+		| UKCorporateTaxResult
+		| GermanyCorporateTaxResult;
 	provincialTax?:
 		| CanadaCorporateTaxResult
 		| FranceCorporateTaxResult
 		| SouthAfricaCorporateTaxResult
 		| AustraliaCorporateTaxResult
-		| UKCorporateTaxResult;
+		| UKCorporateTaxResult
+		| GermanyCorporateTaxResult;
 }

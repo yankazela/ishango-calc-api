@@ -1,5 +1,4 @@
 import {
-	CalculatorType,
 	CanadaIncomeTaxService,
 	CanadaComputedIncomeTaxValues,
 	CanadaIncomeTaxRules,
@@ -19,6 +18,7 @@ import {
 	GermanyIncomeTaxRules,
 	GermanyComputedIncomeTaxValues,
 } from '@novha/calc-engines';
+import { CalculatorType } from '../../../../shared/domain/CalculatorType';
 
 import { CanadaIncomeTaxValues, IncomeTaxPrivateResponse, IncomeTaxRequest } from '../../domain/IncomeTaxTypes';
 import { ProcessIncomeTaxInputService } from './ProcessIncomeTaxInputService';

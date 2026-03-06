@@ -1,6 +1,6 @@
 import { Inject } from '@nestjs/common';
-import { CalculatorType } from '@novha/calc-engines';
 import { Repository } from 'typeorm';
+import { CalculatorType } from '../../../domain/CalculatorType';
 
 import { GetCalCountriesResponse, CountryWithCalculatorsItem } from '../domain/GetCalCountriesResponse';
 import { CalcCountryRepositoryService } from './CalcCountryRepositoryService';

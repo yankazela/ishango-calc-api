@@ -1,5 +1,4 @@
 import {
-	CalculatorType,
 	CanadaMortgageService,
 	CanadaMortgageRules,
 	CanadaMortgageCalculationInput,
@@ -23,6 +22,7 @@ import {
 	GermanyMortgageInput,
 	GermanyMortgageOutput,
 } from '@novha/calc-engines';
+import { CalculatorType } from '../../../../shared/domain/CalculatorType';
 
 import { MortgageRequest } from '../../domain/MortgageTypes';
 import { MortgageCalculatorService } from '../mortgage/MortgageCalculatorService';

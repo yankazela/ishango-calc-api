@@ -1,4 +1,4 @@
-import { CalculatorType } from '@novha/calc-engines';
+import { CalculatorType } from '../../../domain/CalculatorType';
 
 import { CalculatorCountries } from '../../entities';
 import { GetCalCountriesResponse, CountryWithCalculatorsItem } from '../domain/GetCalCountriesResponse';

@@ -1,5 +1,5 @@
 import { Inject } from '@nestjs/common';
-import { CalculatorType } from '@novha/calc-engines';
+import { CalculatorType } from '../../../shared/domain/CalculatorType';
 import type { CalcCountryRepositoryService } from '../../../shared/repositories/country/service/CalcCountryRepositoryService';
 import type { CalcProvinceRepositoryService } from '../../../shared/repositories/country/service/CalcProvinceRepositoryService';
 import { RepositoriesSymbols } from '../../../shared/repositories/ioc';

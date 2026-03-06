@@ -3,4 +3,5 @@ export const CalculatorSymbols = {
 	MortgageCalculatorService: Symbol.for('MortgageCalculatorService'),
 	ProcessIncomeTaxInputService: Symbol.for('ProcessIncomeTaxInputService'),
 	CorporateTaxService: Symbol.for('CorporateTaxService'),
+	CapitalGainTaxService: Symbol.for('CapitalGainTaxService'),
 };

@@ -1,5 +1,4 @@
 import {
-	CalculatorType,
 	CanadaCorporateTaxInput,
 	CanadaCorporateTaxService,
 	CanadaCorporateTaxRules,
@@ -19,6 +18,7 @@ import {
 	GermanyCorporateTaxService,
 	GermanyCorporateTaxRules,
 } from '@novha/calc-engines';
+import { CalculatorType } from '../../../../shared/domain/CalculatorType';
 import { CorporateTaxRequest, CorporateTaxResponse } from '../../domain/CorporateTaxTypes';
 import { BaseCalculatorService } from '../BaseCalculatorService';
 import { CorporateTaxService } from './CorporateTaxService';

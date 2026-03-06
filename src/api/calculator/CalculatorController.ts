@@ -8,6 +8,8 @@ import type { MortgageRequest } from './domain/MortgageTypes';
 import type { MortgageCalculatorService } from './service/mortgage/MortgageCalculatorService';
 import type { CorporateTaxService } from './service/corporate-tax/CorporateTaxService';
 import type { CorporateTaxRequest } from './domain/CorporateTaxTypes';
+import type { CapitalGainTaxService } from './service/capital-gain/CapitalGainTaxService';
+import type { CapitalGainTaxRequest } from './domain/CapitalGainTaxTypes';
 
 @Controller('calculators')
 export class CalculatorController {
@@ -20,6 +22,8 @@ export class CalculatorController {
 		private readonly mortgageCalculatorService: MortgageCalculatorService,
 		@Inject(CalculatorSymbols.CorporateTaxService)
 		private readonly corporateTaxService: CorporateTaxService,
+		@Inject(CalculatorSymbols.CapitalGainTaxService)
+		private readonly capitalGainTaxService: CapitalGainTaxService,
 	) {}
 
 	@Get('/')
@@ -45,5 +49,10 @@ export class CalculatorController {
 	@Post('/process-corporate-tax')
 	processCorporateTax(@Body() request: CorporateTaxRequest): Promise<unknown> {
 		return this.corporateTaxService.processCorporateTax<unknown>(request);
+	}
+
+	@Post('/process-capital-gain-tax')
+	processCapitalGainTax(@Body() request: CapitalGainTaxRequest): Promise<unknown> {
+		return this.capitalGainTaxService.processCapitalGainTax<unknown>(request);
 	}
 }

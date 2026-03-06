@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { CalculatorProvinces } from '../../entities';
 import { CalcProvinceRepositoryService } from './CalcProvinceRepositoryService';
 import { RepositoriesSymbols } from '../../ioc';
-import { CalculatorType } from '@novha/calc-engines';
+import { CalculatorType } from '../../../domain/CalculatorType';
 
 export class CalcProvinceRepositoryServiceImpl implements CalcProvinceRepositoryService {
 	constructor(

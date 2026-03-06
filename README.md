@@ -30,7 +30,6 @@ All endpoints are prefixed with `/api/v1`.
 | `POST` | `/calculators/process-income-tax/private` | Calculate income tax (simplified) |
 | `POST` | `/calculators/process-mortgage` | Calculate mortgage |
 | `POST` | `/calculators/process-corporate-tax` | Calculate corporate tax |
-| `POST` | `/calculators/process-capital-gain` | Calculate capital gain tax |
 | `GET` | `/countries/calculators/:name/:year` | List countries for a calculator type & year |
 | `GET` | `/countries/calculators` | List all countries with calculators |
 | `GET` | `/experts/:countryCode/:calculatorType` | List experts by country & type |
@@ -41,7 +40,7 @@ All endpoints are prefixed with `/api/v1`.
 
 ## Supported Countries
 
-Canada, France, South Africa, Australia, the United Kingdom, the United States, and Germany — each supporting income tax, mortgage, corporate tax, and capital gain calculations.
+Canada, France, South Africa, Australia, and the United Kingdom — each supporting income tax, mortgage, and corporate tax calculations.
 
 ## Project Setup
 

@@ -38,7 +38,7 @@ export class ProcessIncomeTaxInputServiceImpl extends BaseCalculatorService impl
 					return (await this.processAustraliaIncomeTax(data, isPrivate)) as T;
 				case 'uk':
 					return (await this.processUKIncomeTax(data, isPrivate)) as T;
-				case 'de':
+				case 'ge':
 					return (await this.processGermanyIncomeTax(data, isPrivate)) as T;
 				default:
 					throw new Error(`Unsupported country: ${data.countryCode}`);

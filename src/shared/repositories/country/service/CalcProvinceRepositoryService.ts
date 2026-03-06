@@ -1,4 +1,4 @@
-import { CalculatorType } from '@novha/calc-engines';
+import { CalculatorType } from '../../../domain/CalculatorType';
 import { CalculatorProvinces } from '../../entities';
 
 export interface CalcProvinceRepositoryService {

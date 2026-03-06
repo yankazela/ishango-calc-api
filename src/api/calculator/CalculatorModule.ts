@@ -9,6 +9,7 @@ import { ProcessIncomeTaxInputServiceImpl } from './service/income-tax/ProcessIn
 import { CountryRepositoryModule } from '../../shared/repositories/country/CountryRepositoryModule';
 import { MortgageCalculatorServiceImpl } from './service/mortgage/MortgageCalculatorServiceImpl';
 import { CorporateTaxServiceImpl } from './service/corporate-tax/CorporateTaxServiceImpl';
+import { CapitalGainTaxServiceImpl } from './service/capital-gain/CapitalGainTaxServiceImpl';
 
 @Module({
 	imports: [CalculatorRepositoryModule, CountryRepositoryModule],
@@ -33,6 +34,10 @@ import { CorporateTaxServiceImpl } from './service/corporate-tax/CorporateTaxSer
 		{
 			provide: CalculatorSymbols.CorporateTaxService,
 			useClass: CorporateTaxServiceImpl,
+		},
+		{
+			provide: CalculatorSymbols.CapitalGainTaxService,
+			useClass: CapitalGainTaxServiceImpl,
 		},
 	],
 })

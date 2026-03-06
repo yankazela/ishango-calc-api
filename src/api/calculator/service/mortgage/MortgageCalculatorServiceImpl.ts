@@ -18,6 +18,10 @@ import {
 	UKMortgageRules,
 	UKMortgageInput,
 	UKMortgageOutput,
+	GermanyMortgageService,
+	GermanyMortgageRules,
+	GermanyMortgageInput,
+	GermanyMortgageOutput,
 } from '@novha/calc-engines';
 
 import { MortgageRequest } from '../../domain/MortgageTypes';
@@ -38,6 +42,8 @@ export class MortgageCalculatorServiceImpl extends BaseCalculatorService impleme
 					return (await this.processAustraliaMortgage(data)) as T;
 				case 'uk':
 					return (await this.processUKMortgage(data)) as T;
+				case 'de':
+					return (await this.processGermanyMortgage(data)) as T;
 				default:
 					throw new Error(`Unsupported country: ${data.countryCode}`);
 			}
@@ -177,5 +183,26 @@ export class MortgageCalculatorServiceImpl extends BaseCalculatorService impleme
 		const ukMortgageService = new UKMortgageService();
 
 		return ukMortgageService.calculate(input, countryRules);
+	}
+
+	async processGermanyMortgage(data: MortgageRequest): Promise<GermanyMortgageOutput> {
+		const { propertyPrice, downPayment, interestRate, amortizationYears } = data.details;
+
+		const input: GermanyMortgageInput = {
+			propertyPrice,
+			downPayment,
+			annualInterestRate: interestRate,
+			amortizationYears,
+		};
+
+		const countryRules = await this.getCountryRules<GermanyMortgageRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.MORTGAGE,
+		);
+
+		const germanyMortgageService = new GermanyMortgageService();
+
+		return germanyMortgageService.calculate(input, countryRules);
 	}
 }

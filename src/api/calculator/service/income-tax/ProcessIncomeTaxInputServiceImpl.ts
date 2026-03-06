@@ -15,6 +15,9 @@ import {
 	UKIncomeTaxService,
 	UKIncomeTaxRules,
 	UKComputedIncomeTaxValues,
+	GermanyIncomeTaxService,
+	GermanyIncomeTaxRules,
+	GermanyComputedIncomeTaxValues,
 } from '@novha/calc-engines';
 
 import { CanadaIncomeTaxValues, IncomeTaxPrivateResponse, IncomeTaxRequest } from '../../domain/IncomeTaxTypes';
@@ -35,6 +38,8 @@ export class ProcessIncomeTaxInputServiceImpl extends BaseCalculatorService impl
 					return (await this.processAustraliaIncomeTax(data, isPrivate)) as T;
 				case 'uk':
 					return (await this.processUKIncomeTax(data, isPrivate)) as T;
+				case 'de':
+					return (await this.processGermanyIncomeTax(data, isPrivate)) as T;
 				default:
 					throw new Error(`Unsupported country: ${data.countryCode}`);
 			}
@@ -184,6 +189,32 @@ export class ProcessIncomeTaxInputServiceImpl extends BaseCalculatorService impl
 		const ukIncomeTaxService = new UKIncomeTaxService(data.income, countryRules);
 
 		const result = ukIncomeTaxService.calculateNetIncome();
+
+		if (isPrivate) {
+			return {
+				grossIncome: result.grossIncome,
+				netIncome: result.netIncome,
+				incomeTax: result.incomeTax,
+				taxBracketBreakdown: result.taxBracketBreakdown,
+			};
+		}
+
+		return result;
+	}
+
+	async processGermanyIncomeTax(
+		data: IncomeTaxRequest,
+		isPrivate: boolean,
+	): Promise<GermanyComputedIncomeTaxValues | IncomeTaxPrivateResponse> {
+		const countryRules = await this.getCountryRules<GermanyIncomeTaxRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.INCOME_TAX,
+		);
+
+		const germanyIncomeTaxService = new GermanyIncomeTaxService(data.income, countryRules);
+
+		const result = germanyIncomeTaxService.calculateNetIncome();
 
 		if (isPrivate) {
 			return {

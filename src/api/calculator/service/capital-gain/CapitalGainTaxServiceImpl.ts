@@ -1,16 +1,9 @@
-import { CalculatorType } from '../../../../shared/domain/CalculatorType';
-import {
-	CapitalGainTaxRequest,
-	CapitalGainTaxResponse,
-	CapitalGainTaxResult,
-	CanadaCapitalGainTaxRules,
-	FranceCapitalGainTaxRules,
-	SouthAfricaCapitalGainTaxRules,
-	AustraliaCapitalGainTaxRules,
-	UKCapitalGainTaxRules,
-	USACapitalGainTaxRules,
-	GermanyCapitalGainTaxRules,
-} from '../../domain/CapitalGainTaxTypes';
+import { CapitalGain } from '@novha/calc-engines';
+
+import { CalculatorType } from '@novha/calc-engines';
+
+import { CapitalGainTaxRequest } from '../../domain/CapitalGainTaxTypes';
+
 import { BaseCalculatorService } from '../BaseCalculatorService';
 import { CapitalGainTaxService } from './CapitalGainTaxService';
 
@@ -40,172 +33,141 @@ export class CapitalGainTaxServiceImpl extends BaseCalculatorService implements 
 		}
 	}
 
-	private calculateTaxFromBrackets(
-		taxableGain: number,
-		brackets: { from: number; to: number | null; rate: number }[],
-	): number {
-		let tax = 0;
-		let remaining = taxableGain;
-
-		for (const bracket of brackets) {
-			if (remaining <= 0) break;
-
-			const bracketSize = bracket.to !== null ? bracket.to - bracket.from : remaining;
-			const taxable = Math.min(remaining, bracketSize);
-			tax += taxable * bracket.rate;
-			remaining -= taxable;
-		}
-
-		return tax;
-	}
-
-	private buildResult(capitalGain: number, taxableGain: number, taxOnGain: number): CapitalGainTaxResult {
-		return {
-			capitalGain,
-			taxableGain,
-			taxOnGain,
-			effectiveRate: capitalGain > 0 ? taxOnGain / capitalGain : 0,
-		};
-	}
-
-	private async processCanadaCapitalGainTax(data: CapitalGainTaxRequest): Promise<CapitalGainTaxResponse> {
-		const countryRules = await this.getCountryRules<CanadaCapitalGainTaxRules>(
+	private async processCanadaCapitalGainTax(data: CapitalGainTaxRequest): Promise<CapitalGain.Result> {
+		const countryRules = await this.getCountryRules<CapitalGain.CanadaCapitalGainsRules>(
 			data.countryCode,
 			data.year,
-			CalculatorType.CAPITAL_GAIN_TAX,
+			CalculatorType.CAPITAL_GAINS,
 		);
 
-		const taxableGain = data.details.capitalGain * countryRules.inclusionRate;
-		const taxOnGain = this.calculateTaxFromBrackets(taxableGain, countryRules.taxBrackets);
+		const canadaCapitalGainsService = new CapitalGain.CanadaCapitalGainsService(
+			{
+				capitalGain: data.details.capitalGain,
+				totalTaxableIncome: data.details.totalTaxableIncome || data.details.capitalGain,
+			},
+			countryRules,
+		);
 
-		const result: CapitalGainTaxResponse = {
-			federalTax: this.buildResult(data.details.capitalGain, taxableGain, taxOnGain),
-		};
+		const taxOnGain = canadaCapitalGainsService.calculate();
 
-		if (data.provinceCode) {
-			const provinceRules = await this.getProvinceRules<CanadaCapitalGainTaxRules>(
-				data.provinceCode,
-				data.year,
-				CalculatorType.CAPITAL_GAIN_TAX,
-			);
-			const provincialTax = this.calculateTaxFromBrackets(taxableGain, provinceRules.taxBrackets);
-			result.provincialTax = this.buildResult(data.details.capitalGain, taxableGain, provincialTax);
-		}
-
-		return result;
+		return taxOnGain;
 	}
 
-	private async processFranceCapitalGainTax(data: CapitalGainTaxRequest): Promise<CapitalGainTaxResponse> {
-		const countryRules = await this.getCountryRules<FranceCapitalGainTaxRules>(
+	private async processFranceCapitalGainTax(data: CapitalGainTaxRequest): Promise<CapitalGain.Result> {
+		const countryRules = await this.getCountryRules<CapitalGain.FranceCapitalGainsRules>(
 			data.countryCode,
 			data.year,
-			CalculatorType.CAPITAL_GAIN_TAX,
+			CalculatorType.CAPITAL_GAINS,
 		);
 
-		let discountRate = 0;
-		for (const discount of countryRules.holdingPeriodDiscounts) {
-			if (
-				data.details.holdingPeriodMonths >= discount.minMonths &&
-				(discount.maxMonths === null || data.details.holdingPeriodMonths <= discount.maxMonths)
-			) {
-				discountRate = discount.discountRate;
-				break;
-			}
-		}
+		const franceCapitalGainsService = new CapitalGain.FranceCapitalGainsService(
+			{ capitalGain: data.details.capitalGain },
+			countryRules,
+		);
 
-		const taxableGain = data.details.capitalGain * (1 - discountRate);
-		const taxOnGain = taxableGain * (countryRules.flatTaxRate + countryRules.socialContributionsRate);
+		const taxOnGain = franceCapitalGainsService.calculate();
 
-		return {
-			federalTax: this.buildResult(data.details.capitalGain, taxableGain, taxOnGain),
-		};
+		return taxOnGain;
 	}
 
-	private async processSouthAfricaCapitalGainTax(data: CapitalGainTaxRequest): Promise<CapitalGainTaxResponse> {
-		const countryRules = await this.getCountryRules<SouthAfricaCapitalGainTaxRules>(
+	private async processSouthAfricaCapitalGainTax(data: CapitalGainTaxRequest): Promise<CapitalGain.Result> {
+		const countryRules = await this.getCountryRules<CapitalGain.SouthAfricaCapitalGainsRules>(
 			data.countryCode,
 			data.year,
-			CalculatorType.CAPITAL_GAIN_TAX,
+			CalculatorType.CAPITAL_GAINS,
 		);
 
-		const gainAfterExclusion = Math.max(0, data.details.capitalGain - countryRules.annualExclusion);
-		const taxableGain = gainAfterExclusion * countryRules.inclusionRate;
-		const taxOnGain = this.calculateTaxFromBrackets(taxableGain, countryRules.taxBrackets);
+		const southAfricaCapitalGainsService = new CapitalGain.SouthAfricaCapitalGainsService(
+			{
+				capitalGain: data.details.capitalGain,
+				totalTaxableIncome: data.details.totalTaxableIncome || data.details.capitalGain,
+			},
+			countryRules,
+		);
 
-		return {
-			federalTax: this.buildResult(data.details.capitalGain, taxableGain, taxOnGain),
-		};
+		const taxOnGain = southAfricaCapitalGainsService.calculate();
+
+		return taxOnGain;
 	}
 
-	private async processAustraliaCapitalGainTax(data: CapitalGainTaxRequest): Promise<CapitalGainTaxResponse> {
-		const countryRules = await this.getCountryRules<AustraliaCapitalGainTaxRules>(
+	private async processAustraliaCapitalGainTax(data: CapitalGainTaxRequest): Promise<CapitalGain.Result> {
+		const countryRules = await this.getCountryRules<CapitalGain.AustraliaCapitalGainsRules>(
 			data.countryCode,
 			data.year,
-			CalculatorType.CAPITAL_GAIN_TAX,
+			CalculatorType.CAPITAL_GAINS,
 		);
 
-		const eligibleForDiscount = data.details.holdingPeriodMonths >= countryRules.cgtDiscountMinHoldingMonths;
-		const taxableGain = eligibleForDiscount
-			? data.details.capitalGain * (1 - countryRules.cgtDiscountRate)
-			: data.details.capitalGain;
-		const taxOnGain = this.calculateTaxFromBrackets(taxableGain, countryRules.taxBrackets);
+		const australiaCapitalGainsService = new CapitalGain.AustraliaCapitalGainsService(
+			{
+				capitalGain: data.details.capitalGain,
+				totalTaxableIncome: data.details.totalTaxableIncome || data.details.capitalGain,
+				holdingPeriodMonths: data.details.holdingPeriodMonths || 0,
+			},
+			countryRules,
+		);
 
-		return {
-			federalTax: this.buildResult(data.details.capitalGain, taxableGain, taxOnGain),
-		};
+		const taxOnGain = australiaCapitalGainsService.calculate();
+
+		return taxOnGain;
 	}
 
-	private async processUKCapitalGainTax(data: CapitalGainTaxRequest): Promise<CapitalGainTaxResponse> {
-		const countryRules = await this.getCountryRules<UKCapitalGainTaxRules>(
+	private async processUKCapitalGainTax(data: CapitalGainTaxRequest): Promise<CapitalGain.Result> {
+		const countryRules = await this.getCountryRules<CapitalGain.UKCapitalGainsRules>(
 			data.countryCode,
 			data.year,
-			CalculatorType.CAPITAL_GAIN_TAX,
+			CalculatorType.CAPITAL_GAINS,
 		);
 
-		const taxableGain = Math.max(0, data.details.capitalGain - countryRules.annualExemptAmount);
-		const annualIncome = data.details.annualIncome || 0;
-		const remainingBasicBand = Math.max(0, countryRules.basicRateThreshold - annualIncome);
+		const ukCapitalGainsService = new CapitalGain.UKCapitalGainsService(
+			{
+				capitalGain: data.details.capitalGain,
+				totalTaxableIncome: data.details.totalTaxableIncome || data.details.capitalGain,
+			},
+			countryRules,
+		);
 
-		const gainAtBasicRate = Math.min(taxableGain, remainingBasicBand);
-		const gainAtHigherRate = Math.max(0, taxableGain - remainingBasicBand);
-		const taxOnGain = gainAtBasicRate * countryRules.basicRate + gainAtHigherRate * countryRules.higherRate;
+		const taxOnGain = ukCapitalGainsService.calculate();
 
-		return {
-			federalTax: this.buildResult(data.details.capitalGain, taxableGain, taxOnGain),
-		};
+		return taxOnGain;
 	}
 
-	private async processUSACapitalGainTax(data: CapitalGainTaxRequest): Promise<CapitalGainTaxResponse> {
-		const countryRules = await this.getCountryRules<USACapitalGainTaxRules>(
+	private async processUSACapitalGainTax(data: CapitalGainTaxRequest): Promise<CapitalGain.Result> {
+		const countryRules = await this.getCountryRules<CapitalGain.USACapitalGainsRules>(
 			data.countryCode,
 			data.year,
-			CalculatorType.CAPITAL_GAIN_TAX,
+			CalculatorType.CAPITAL_GAINS,
 		);
 
-		const isLongTerm = data.details.holdingPeriodMonths >= countryRules.longTermThresholdMonths;
-		const brackets = isLongTerm ? countryRules.longTermBrackets : countryRules.shortTermBrackets;
-		const taxableGain = data.details.capitalGain;
-		const taxOnGain = this.calculateTaxFromBrackets(taxableGain, brackets);
+		const usaCapitalGainsService = new CapitalGain.USACapitalGainsService(
+			{
+				capitalGain: data.details.capitalGain,
+				totalTaxableIncome: data.details.totalTaxableIncome || data.details.capitalGain,
+				holdingPeriodMonths: data.details.holdingPeriodMonths || 0,
+			},
+			countryRules,
+		);
 
-		return {
-			federalTax: this.buildResult(data.details.capitalGain, taxableGain, taxOnGain),
-		};
+		const taxOnGain = usaCapitalGainsService.calculate();
+
+		return taxOnGain;
 	}
 
-	private async processGermanyCapitalGainTax(data: CapitalGainTaxRequest): Promise<CapitalGainTaxResponse> {
-		const countryRules = await this.getCountryRules<GermanyCapitalGainTaxRules>(
+	private async processGermanyCapitalGainTax(data: CapitalGainTaxRequest): Promise<CapitalGain.Result> {
+		const countryRules = await this.getCountryRules<CapitalGain.GermanyCapitalGainsRules>(
 			data.countryCode,
 			data.year,
-			CalculatorType.CAPITAL_GAIN_TAX,
+			CalculatorType.CAPITAL_GAINS,
 		);
 
-		const taxableGain = Math.max(0, data.details.capitalGain - countryRules.saverAllowance);
-		const baseTax = taxableGain * countryRules.flatTaxRate;
-		const solidaritySurcharge = baseTax * countryRules.solidaritySurchargeRate;
-		const taxOnGain = baseTax + solidaritySurcharge;
+		const germanyCapitalGainsService = new CapitalGain.GermanyCapitalGainsService(
+			{
+				capitalGain: data.details.capitalGain,
+			},
+			countryRules,
+		);
 
-		return {
-			federalTax: this.buildResult(data.details.capitalGain, taxableGain, taxOnGain),
-		};
+		const taxOnGain = germanyCapitalGainsService.calculate();
+
+		return taxOnGain;
 	}
 }

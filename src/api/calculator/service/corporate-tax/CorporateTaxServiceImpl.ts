@@ -1,23 +1,4 @@
-import {
-	CanadaCorporateTaxInput,
-	CanadaCorporateTaxService,
-	CanadaCorporateTaxRules,
-	FranceCorporateTaxInput,
-	FranceCorporateTaxService,
-	FranceCorporateTaxRules,
-	SouthAfricaCorporateTaxInput,
-	SouthAfricaCorporateTaxService,
-	SouthAfricaCorporateTaxRules,
-	AustraliaCorporateTaxInput,
-	AustraliaCorporateTaxService,
-	AustraliaCorporateTaxRules,
-	UKCorporateTaxInput,
-	UKCorporateTaxService,
-	UKCorporateTaxRules,
-	GermanyCorporateTaxInput,
-	GermanyCorporateTaxService,
-	GermanyCorporateTaxRules,
-} from '@novha/calc-engines';
+import { CorporateTax } from '@novha/calc-engines';
 import { CalculatorType } from '../../../../shared/domain/CalculatorType';
 import { CorporateTaxRequest, CorporateTaxResponse } from '../../domain/CorporateTaxTypes';
 import { BaseCalculatorService } from '../BaseCalculatorService';
@@ -49,27 +30,27 @@ export class CorporateTaxServiceImpl extends BaseCalculatorService implements Co
 	}
 
 	private async processCanadaCorporateTax(data: CorporateTaxRequest): Promise<CorporateTaxResponse> {
-		const countryRules = await this.getCountryRules<CanadaCorporateTaxRules>(
+		const countryRules = await this.getCountryRules<CorporateTax.CanadaCorporateTaxRules>(
 			data.countryCode,
 			data.year,
 			CalculatorType.CORPORATE_TAX,
 		);
-		const canadaInput: CanadaCorporateTaxInput = {
+		const canadaInput: CorporateTax.CanadaCorporateTaxInput = {
 			taxableIncome: data.details.taxableIncome,
 			isSmallBusiness: data.details.isSmallBusiness,
 		};
 
-		const canadaService = new CanadaCorporateTaxService(canadaInput, countryRules);
+		const canadaService = new CorporateTax.CanadaCorporateTaxService(canadaInput, countryRules);
 
 		if (!data.provinceCode) {
 			throw new Error('Province code is required for Canada corporate tax calculation');
 		}
-		const provinceRules = await this.getProvinceRules<CanadaCorporateTaxRules>(
+		const provinceRules = await this.getProvinceRules<CorporateTax.CanadaCorporateTaxRules>(
 			data.provinceCode,
 			data.year,
 			CalculatorType.CORPORATE_TAX,
 		);
-		const provinceService = new CanadaCorporateTaxService(canadaInput, provinceRules);
+		const provinceService = new CorporateTax.CanadaCorporateTaxService(canadaInput, provinceRules);
 		const provinceResult = provinceService.calculate();
 
 		return {
@@ -79,19 +60,19 @@ export class CorporateTaxServiceImpl extends BaseCalculatorService implements Co
 	}
 
 	private async processFranceCorporateTax(data: CorporateTaxRequest): Promise<CorporateTaxResponse> {
-		const countryRules = await this.getCountryRules<FranceCorporateTaxRules>(
+		const countryRules = await this.getCountryRules<CorporateTax.FranceCorporateTaxRules>(
 			data.countryCode,
 			data.year,
 			CalculatorType.CORPORATE_TAX,
 		);
 
-		const franceInput: FranceCorporateTaxInput = {
+		const franceInput: CorporateTax.FranceCorporateTaxInput = {
 			taxableIncome: data.details.taxableIncome,
 			isSmallBusiness: data.details.isSmallBusiness,
 			annualTurnover: data.details.annualTurnover || 0,
 		};
 
-		const franceService = new FranceCorporateTaxService(franceInput, countryRules);
+		const franceService = new CorporateTax.FranceCorporateTaxService(franceInput, countryRules);
 
 		return {
 			federalTax: franceService.calculate(),
@@ -99,18 +80,18 @@ export class CorporateTaxServiceImpl extends BaseCalculatorService implements Co
 	}
 
 	private async processSouthAfricaCorporateTax(data: CorporateTaxRequest): Promise<CorporateTaxResponse> {
-		const countryRules = await this.getCountryRules<SouthAfricaCorporateTaxRules>(
+		const countryRules = await this.getCountryRules<CorporateTax.SouthAfricaCorporateTaxRules>(
 			data.countryCode,
 			data.year,
 			CalculatorType.CORPORATE_TAX,
 		);
 
-		const southAfricaInput: SouthAfricaCorporateTaxInput = {
+		const southAfricaInput: CorporateTax.SouthAfricaCorporateTaxInput = {
 			taxableIncome: data.details.taxableIncome,
 			regime: data.details.isSmallBusiness ? 'SBC' : 'LARGE',
 		};
 
-		const southAfricaService = new SouthAfricaCorporateTaxService(southAfricaInput, countryRules);
+		const southAfricaService = new CorporateTax.SouthAfricaCorporateTaxService(southAfricaInput, countryRules);
 
 		return {
 			federalTax: southAfricaService.calculate(),
@@ -118,19 +99,19 @@ export class CorporateTaxServiceImpl extends BaseCalculatorService implements Co
 	}
 
 	private async processAustraliaCorporateTax(data: CorporateTaxRequest): Promise<CorporateTaxResponse> {
-		const countryRules = await this.getCountryRules<AustraliaCorporateTaxRules>(
+		const countryRules = await this.getCountryRules<CorporateTax.AustraliaCorporateTaxRules>(
 			data.countryCode,
 			data.year,
 			CalculatorType.CORPORATE_TAX,
 		);
 
-		const australiaInput: AustraliaCorporateTaxInput = {
+		const australiaInput: CorporateTax.AustraliaCorporateTaxInput = {
 			taxableIncome: data.details.taxableIncome,
 			isSmallBusiness: data.details.isSmallBusiness,
 			annualTurnover: data.details.annualTurnover || 0,
 		};
 
-		const australiaService = new AustraliaCorporateTaxService(australiaInput, countryRules);
+		const australiaService = new CorporateTax.AustraliaCorporateTaxService(australiaInput, countryRules);
 
 		return {
 			federalTax: australiaService.calculate(),
@@ -138,17 +119,17 @@ export class CorporateTaxServiceImpl extends BaseCalculatorService implements Co
 	}
 
 	private async processUKCorporateTax(data: CorporateTaxRequest): Promise<CorporateTaxResponse> {
-		const countryRules = await this.getCountryRules<UKCorporateTaxRules>(
+		const countryRules = await this.getCountryRules<CorporateTax.UKCorporateTaxRules>(
 			data.countryCode,
 			data.year,
 			CalculatorType.CORPORATE_TAX,
 		);
 
-		const ukInput: UKCorporateTaxInput = {
+		const ukInput: CorporateTax.UKCorporateTaxInput = {
 			taxableIncome: data.details.taxableIncome,
 		};
 
-		const ukService = new UKCorporateTaxService(ukInput, countryRules);
+		const ukService = new CorporateTax.UKCorporateTaxService(ukInput, countryRules);
 
 		return {
 			federalTax: ukService.calculate(),
@@ -156,17 +137,17 @@ export class CorporateTaxServiceImpl extends BaseCalculatorService implements Co
 	}
 
 	private async processGermanyCorporateTax(data: CorporateTaxRequest): Promise<CorporateTaxResponse> {
-		const countryRules = await this.getCountryRules<GermanyCorporateTaxRules>(
+		const countryRules = await this.getCountryRules<CorporateTax.GermanyCorporateTaxRules>(
 			data.countryCode,
 			data.year,
 			CalculatorType.CORPORATE_TAX,
 		);
 
-		const germanyInput: GermanyCorporateTaxInput = {
+		const germanyInput: CorporateTax.GermanyCorporateTaxInput = {
 			taxableIncome: data.details.taxableIncome,
 		};
 
-		const germanyService = new GermanyCorporateTaxService(germanyInput, countryRules);
+		const germanyService = new CorporateTax.GermanyCorporateTaxService(germanyInput, countryRules);
 
 		return {
 			federalTax: germanyService.calculate(),

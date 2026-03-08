@@ -51,7 +51,7 @@ export class CalculatorController {
 		return this.corporateTaxService.processCorporateTax<unknown>(request);
 	}
 
-	@Post('/process-capital-gain-tax')
+	@Post('/process-capital-gains-tax')
 	processCapitalGainTax(@Body() request: CapitalGainTaxRequest): Promise<unknown> {
 		return this.capitalGainTaxService.processCapitalGainTax<unknown>(request);
 	}

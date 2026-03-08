@@ -1,4 +1,4 @@
-import { CanadaComputedIncomeTaxValues } from '@novha/calc-engines';
+import { IncomeTax } from '@novha/calc-engines';
 
 export interface IncomeTaxRequest {
 	income: number;
@@ -13,8 +13,8 @@ export interface IncomeTaxRequest {
 }
 
 export interface CanadaIncomeTaxValues {
-	federalTax: CanadaComputedIncomeTaxValues;
-	provincialTax: CanadaComputedIncomeTaxValues | null;
+	federalTax: IncomeTax.CanadaComputedIncomeTaxValues;
+	provincialTax: IncomeTax.CanadaComputedIncomeTaxValues | null;
 }
 
 export interface BracketAllocation {

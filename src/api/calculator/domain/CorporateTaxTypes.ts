@@ -1,11 +1,4 @@
-import {
-	CanadaCorporateTaxResult,
-	FranceCorporateTaxResult,
-	SouthAfricaCorporateTaxResult,
-	AustraliaCorporateTaxResult,
-	UKCorporateTaxResult,
-	GermanyCorporateTaxResult,
-} from '@novha/calc-engines';
+import { CorporateTax } from '@novha/calc-engines';
 
 export interface CorporateTaxRequest {
 	details: {
@@ -21,17 +14,17 @@ export interface CorporateTaxRequest {
 
 export interface CorporateTaxResponse {
 	federalTax:
-		| CanadaCorporateTaxResult
-		| FranceCorporateTaxResult
-		| SouthAfricaCorporateTaxResult
-		| AustraliaCorporateTaxResult
-		| UKCorporateTaxResult
-		| GermanyCorporateTaxResult;
+		| CorporateTax.CanadaCorporateTaxResult
+		| CorporateTax.FranceCorporateTaxResult
+		| CorporateTax.SouthAfricaCorporateTaxResult
+		| CorporateTax.AustraliaCorporateTaxResult
+		| CorporateTax.UKCorporateTaxResult
+		| CorporateTax.GermanyCorporateTaxResult;
 	provincialTax?:
-		| CanadaCorporateTaxResult
-		| FranceCorporateTaxResult
-		| SouthAfricaCorporateTaxResult
-		| AustraliaCorporateTaxResult
-		| UKCorporateTaxResult
-		| GermanyCorporateTaxResult;
+		| CorporateTax.CanadaCorporateTaxResult
+		| CorporateTax.FranceCorporateTaxResult
+		| CorporateTax.SouthAfricaCorporateTaxResult
+		| CorporateTax.AustraliaCorporateTaxResult
+		| CorporateTax.UKCorporateTaxResult
+		| CorporateTax.GermanyCorporateTaxResult;
 }

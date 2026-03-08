@@ -1,23 +1,4 @@
-import {
-	CanadaIncomeTaxService,
-	CanadaComputedIncomeTaxValues,
-	CanadaIncomeTaxRules,
-	FranceComputedIncomeTaxValues,
-	FranceIncomeTaxService,
-	FranceIncomeTaxRules,
-	SouthAfricaIncomeTaxService,
-	SouthAfricaIncomeTaxRules,
-	SouthAfricaComputedIncomeTaxValues,
-	AustraliaIncomeTaxService,
-	AustraliaIncomeTaxRules,
-	AustraliaComputedIncomeTaxValues,
-	UKIncomeTaxService,
-	UKIncomeTaxRules,
-	UKComputedIncomeTaxValues,
-	GermanyIncomeTaxService,
-	GermanyIncomeTaxRules,
-	GermanyComputedIncomeTaxValues,
-} from '@novha/calc-engines';
+import { IncomeTax } from '@novha/calc-engines';
 import { CalculatorType } from '../../../../shared/domain/CalculatorType';
 
 import { CanadaIncomeTaxValues, IncomeTaxPrivateResponse, IncomeTaxRequest } from '../../domain/IncomeTaxTypes';
@@ -52,24 +33,24 @@ export class ProcessIncomeTaxInputServiceImpl extends BaseCalculatorService impl
 		data: IncomeTaxRequest,
 		isPrivate: boolean,
 	): Promise<CanadaIncomeTaxValues | IncomeTaxPrivateResponse> {
-		const countryRules = await this.getCountryRules<CanadaIncomeTaxRules>(
+		const countryRules = await this.getCountryRules<IncomeTax.CanadaIncomeTaxRules>(
 			data.countryCode,
 			data.year,
 			CalculatorType.INCOME_TAX,
 		);
-		const canadaIncomeTaxService = new CanadaIncomeTaxService(data.income, countryRules);
+		const canadaIncomeTaxService = new IncomeTax.CanadaIncomeTaxService(data.income, countryRules);
 		const countryTax = canadaIncomeTaxService.calculateNetIncome();
-		let provinceTax: CanadaComputedIncomeTaxValues | null = null;
+		let provinceTax: IncomeTax.CanadaComputedIncomeTaxValues | null = null;
 
 		if (!data.provinceCode) {
 			throw new Error('Province code is required for Canada income tax calculation');
 		}
-		const provinceRules = await this.getProvinceRules<CanadaIncomeTaxRules>(
+		const provinceRules = await this.getProvinceRules<IncomeTax.CanadaIncomeTaxRules>(
 			data.provinceCode,
 			data.year,
 			CalculatorType.INCOME_TAX,
 		);
-		const provinceIncomeTaxService = new CanadaIncomeTaxService(data.income, provinceRules);
+		const provinceIncomeTaxService = new IncomeTax.CanadaIncomeTaxService(data.income, provinceRules);
 		provinceTax = provinceIncomeTaxService.calculateNetIncome();
 
 		const result = {
@@ -93,13 +74,17 @@ export class ProcessIncomeTaxInputServiceImpl extends BaseCalculatorService impl
 	async processFranceIncomeTax(
 		data: IncomeTaxRequest,
 		isPrivate: boolean,
-	): Promise<FranceComputedIncomeTaxValues | IncomeTaxPrivateResponse> {
-		const countryRules = await this.getCountryRules<FranceIncomeTaxRules>(
+	): Promise<IncomeTax.FranceComputedIncomeTaxValues | IncomeTaxPrivateResponse> {
+		const countryRules = await this.getCountryRules<IncomeTax.FranceIncomeTaxRules>(
 			data.countryCode,
 			data.year,
 			CalculatorType.INCOME_TAX,
 		);
-		const franceIncomeTaxService = new FranceIncomeTaxService(data.income, countryRules, data.familyPart || 1);
+		const franceIncomeTaxService = new IncomeTax.FranceIncomeTaxService(
+			data.income,
+			countryRules,
+			data.familyPart || 1,
+		);
 
 		const result = franceIncomeTaxService.calculateNetIncome();
 
@@ -118,13 +103,13 @@ export class ProcessIncomeTaxInputServiceImpl extends BaseCalculatorService impl
 	async processSouthAfricaIncomeTax(
 		data: IncomeTaxRequest,
 		isPrivate: boolean,
-	): Promise<SouthAfricaComputedIncomeTaxValues | IncomeTaxPrivateResponse> {
-		const countryRules = await this.getCountryRules<SouthAfricaIncomeTaxRules>(
+	): Promise<IncomeTax.SouthAfricaComputedIncomeTaxValues | IncomeTaxPrivateResponse> {
+		const countryRules = await this.getCountryRules<IncomeTax.SouthAfricaIncomeTaxRules>(
 			data.countryCode,
 			data.year,
 			CalculatorType.INCOME_TAX,
 		);
-		const southAfricaIncomeTaxService = new SouthAfricaIncomeTaxService(
+		const southAfricaIncomeTaxService = new IncomeTax.SouthAfricaIncomeTaxService(
 			data.income,
 			data.age || 64,
 			countryRules,
@@ -148,14 +133,14 @@ export class ProcessIncomeTaxInputServiceImpl extends BaseCalculatorService impl
 	async processAustraliaIncomeTax(
 		data: IncomeTaxRequest,
 		isPrivate: boolean,
-	): Promise<AustraliaComputedIncomeTaxValues | IncomeTaxPrivateResponse> {
-		const countryRules = await this.getCountryRules<AustraliaIncomeTaxRules>(
+	): Promise<IncomeTax.AustraliaComputedIncomeTaxValues | IncomeTaxPrivateResponse> {
+		const countryRules = await this.getCountryRules<IncomeTax.AustraliaIncomeTaxRules>(
 			data.countryCode,
 			data.year,
 			CalculatorType.INCOME_TAX,
 		);
 
-		const australiaIncomeTaxService = new AustraliaIncomeTaxService(
+		const australiaIncomeTaxService = new IncomeTax.AustraliaIncomeTaxService(
 			data.income,
 			countryRules,
 			data.isResident || true,
@@ -179,14 +164,14 @@ export class ProcessIncomeTaxInputServiceImpl extends BaseCalculatorService impl
 	async processUKIncomeTax(
 		data: IncomeTaxRequest,
 		isPrivate: boolean,
-	): Promise<UKComputedIncomeTaxValues | IncomeTaxPrivateResponse> {
-		const countryRules = await this.getCountryRules<UKIncomeTaxRules>(
+	): Promise<IncomeTax.UKComputedIncomeTaxValues | IncomeTaxPrivateResponse> {
+		const countryRules = await this.getCountryRules<IncomeTax.UKIncomeTaxRules>(
 			data.countryCode,
 			data.year,
 			CalculatorType.INCOME_TAX,
 		);
 
-		const ukIncomeTaxService = new UKIncomeTaxService(data.income, countryRules);
+		const ukIncomeTaxService = new IncomeTax.UKIncomeTaxService(data.income, countryRules);
 
 		const result = ukIncomeTaxService.calculateNetIncome();
 
@@ -205,14 +190,14 @@ export class ProcessIncomeTaxInputServiceImpl extends BaseCalculatorService impl
 	async processGermanyIncomeTax(
 		data: IncomeTaxRequest,
 		isPrivate: boolean,
-	): Promise<GermanyComputedIncomeTaxValues | IncomeTaxPrivateResponse> {
-		const countryRules = await this.getCountryRules<GermanyIncomeTaxRules>(
+	): Promise<IncomeTax.GermanyComputedIncomeTaxValues | IncomeTaxPrivateResponse> {
+		const countryRules = await this.getCountryRules<IncomeTax.GermanyIncomeTaxRules>(
 			data.countryCode,
 			data.year,
 			CalculatorType.INCOME_TAX,
 		);
 
-		const germanyIncomeTaxService = new GermanyIncomeTaxService(data.income, countryRules);
+		const germanyIncomeTaxService = new IncomeTax.GermanyIncomeTaxService(data.income, countryRules);
 
 		const result = germanyIncomeTaxService.calculateNetIncome();
 

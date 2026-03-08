@@ -4,4 +4,5 @@ export const CalculatorSymbols = {
 	ProcessIncomeTaxInputService: Symbol.for('ProcessIncomeTaxInputService'),
 	CorporateTaxService: Symbol.for('CorporateTaxService'),
 	CapitalGainTaxService: Symbol.for('CapitalGainTaxService'),
+	InheritanceTaxService: Symbol.for('InheritanceTaxService'),
 };

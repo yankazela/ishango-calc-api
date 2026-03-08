@@ -10,6 +10,7 @@ import { CountryRepositoryModule } from '../../shared/repositories/country/Count
 import { MortgageCalculatorServiceImpl } from './service/mortgage/MortgageCalculatorServiceImpl';
 import { CorporateTaxServiceImpl } from './service/corporate-tax/CorporateTaxServiceImpl';
 import { CapitalGainTaxServiceImpl } from './service/capital-gain/CapitalGainTaxServiceImpl';
+import { InheritanceTaxServiceImpl } from './service/inheritance-tax/InheritanceTaxServiceImpl';
 
 @Module({
 	imports: [CalculatorRepositoryModule, CountryRepositoryModule],
@@ -38,6 +39,10 @@ import { CapitalGainTaxServiceImpl } from './service/capital-gain/CapitalGainTax
 		{
 			provide: CalculatorSymbols.CapitalGainTaxService,
 			useClass: CapitalGainTaxServiceImpl,
+		},
+		{
+			provide: CalculatorSymbols.InheritanceTaxService,
+			useClass: InheritanceTaxServiceImpl,
 		},
 	],
 })

@@ -10,6 +10,8 @@ import type { CorporateTaxService } from './service/corporate-tax/CorporateTaxSe
 import type { CorporateTaxRequest } from './domain/CorporateTaxTypes';
 import type { CapitalGainTaxService } from './service/capital-gain/CapitalGainTaxService';
 import type { CapitalGainTaxRequest } from './domain/CapitalGainTaxTypes';
+import type { InheritanceTaxService } from './service/inheritance-tax/InheritanceTaxService';
+import type { InheritanceTaxRequest } from './domain/InheritanceTaxTypes';
 
 @Controller('calculators')
 export class CalculatorController {
@@ -24,6 +26,8 @@ export class CalculatorController {
 		private readonly corporateTaxService: CorporateTaxService,
 		@Inject(CalculatorSymbols.CapitalGainTaxService)
 		private readonly capitalGainTaxService: CapitalGainTaxService,
+		@Inject(CalculatorSymbols.InheritanceTaxService)
+		private readonly inheritanceTaxService: InheritanceTaxService,
 	) {}
 
 	@Get('/')
@@ -54,5 +58,10 @@ export class CalculatorController {
 	@Post('/process-capital-gains-tax')
 	processCapitalGainTax(@Body() request: CapitalGainTaxRequest): Promise<unknown> {
 		return this.capitalGainTaxService.processCapitalGainTax<unknown>(request);
+	}
+
+	@Post('/process-inheritance-tax')
+	processInheritanceTax(@Body() request: InheritanceTaxRequest): Promise<unknown> {
+		return this.inheritanceTaxService.processInheritanceTax<unknown>(request);
 	}
 }

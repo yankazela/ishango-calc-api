@@ -25,6 +25,14 @@ export class CapitalGainTaxServiceImpl extends BaseCalculatorService implements 
 					return this.processUSACapitalGainTax(data) as Promise<T>;
 				case 'ge':
 					return this.processGermanyCapitalGainTax(data) as Promise<T>;
+				case 'br':
+					return this.processBrazilCapitalGainTax(data) as Promise<T>;
+				case 'es':
+					return this.processSpainCapitalGainTax(data) as Promise<T>;
+				case 'in':
+					return this.processIndiaCapitalGainTax(data) as Promise<T>;
+				case 'jp':
+					return this.processJapanCapitalGainTax(data) as Promise<T>;
 				default:
 					throw new Error(`Unsupported country: ${data.countryCode}`);
 			}
@@ -167,6 +175,83 @@ export class CapitalGainTaxServiceImpl extends BaseCalculatorService implements 
 		);
 
 		const taxOnGain = germanyCapitalGainsService.calculate();
+
+		return taxOnGain;
+	}
+
+	private async processBrazilCapitalGainTax(data: CapitalGainTaxRequest): Promise<CapitalGain.Result> {
+		const countryRules = await this.getCountryRules<CapitalGain.BrazilCapitalGainsRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.CAPITAL_GAINS,
+		);
+
+		const brazilCapitalGainsService = new CapitalGain.BrazilCapitalGainsService(
+			{
+				capitalGain: data.details.capitalGain,
+			},
+			countryRules,
+		);
+
+		const taxOnGain = brazilCapitalGainsService.calculate();
+
+		return taxOnGain;
+	}
+
+	private async processSpainCapitalGainTax(data: CapitalGainTaxRequest): Promise<CapitalGain.Result> {
+		const countryRules = await this.getCountryRules<CapitalGain.SpainCapitalGainsRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.CAPITAL_GAINS,
+		);
+
+		const spainCapitalGainsService = new CapitalGain.SpainCapitalGainsService(
+			{
+				capitalGain: data.details.capitalGain,
+			},
+			countryRules,
+		);
+
+		const taxOnGain = spainCapitalGainsService.calculate();
+
+		return taxOnGain;
+	}
+
+	private async processIndiaCapitalGainTax(data: CapitalGainTaxRequest): Promise<CapitalGain.Result> {
+		const countryRules = await this.getCountryRules<CapitalGain.IndiaCapitalGainsRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.CAPITAL_GAINS,
+		);
+
+		const indiaCapitalGainsService = new CapitalGain.IndiaCapitalGainsService(
+			{
+				capitalGain: data.details.capitalGain,
+				holdingPeriodMonths: data.details.holdingPeriodMonths || 0,
+			},
+			countryRules,
+		);
+
+		const taxOnGain = indiaCapitalGainsService.calculate();
+
+		return taxOnGain;
+	}
+
+	private async processJapanCapitalGainTax(data: CapitalGainTaxRequest): Promise<CapitalGain.Result> {
+		const countryRules = await this.getCountryRules<CapitalGain.JapanCapitalGainsRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.CAPITAL_GAINS,
+		);
+
+		const japanCapitalGainsService = new CapitalGain.JapanCapitalGainsService(
+			{
+				capitalGain: data.details.capitalGain,
+			},
+			countryRules,
+		);
+
+		const taxOnGain = japanCapitalGainsService.calculate();
 
 		return taxOnGain;
 	}

@@ -6,6 +6,7 @@ export interface InheritanceTaxRequest {
 		deductions?: number;
 		charitableGivingPercent?: number;
 		taxClass?: string;
+		numberOfStatutoryHeirs?: number;
 	};
 	countryCode: string;
 	year: string;

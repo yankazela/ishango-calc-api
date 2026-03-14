@@ -21,6 +21,10 @@ export class InheritanceTaxServiceImpl extends BaseCalculatorService implements 
 					return this.processUSAInheritanceTax(data) as Promise<T>;
 				case 'ge':
 					return this.processGermanyInheritanceTax(data) as Promise<T>;
+				case 'es':
+					return this.processSpainInheritanceTax(data) as Promise<T>;
+				case 'jp':
+					return this.processJapanInheritanceTax(data) as Promise<T>;
 				default:
 					throw new Error(`Unsupported country: ${data.countryCode}`);
 			}
@@ -133,6 +137,49 @@ export class InheritanceTaxServiceImpl extends BaseCalculatorService implements 
 		);
 
 		const result = germanyInheritanceTaxService.calculate();
+
+		return result;
+	}
+
+	private async processSpainInheritanceTax(
+		data: InheritanceTaxRequest,
+	): Promise<InheritanceTax.SpainInheritanceTaxResult> {
+		const countryRules = await this.getCountryRules<InheritanceTax.SpainInheritanceTaxRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.INHERITANCE_TAX,
+		);
+
+		const spainInheritanceTaxService = new InheritanceTax.SpainInheritanceTaxService(
+			{
+				estateValue: data.details.estateValue,
+			},
+			countryRules,
+		);
+
+		const result = spainInheritanceTaxService.calculate();
+
+		return result;
+	}
+
+	private async processJapanInheritanceTax(
+		data: InheritanceTaxRequest,
+	): Promise<InheritanceTax.JapanInheritanceTaxResult> {
+		const countryRules = await this.getCountryRules<InheritanceTax.JapanInheritanceTaxRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.INHERITANCE_TAX,
+		);
+
+		const japanInheritanceTaxService = new InheritanceTax.JapanInheritanceTaxService(
+			{
+				estateValue: data.details.estateValue,
+				numberOfStatutoryHeirs: data.details.numberOfStatutoryHeirs || 1,
+			},
+			countryRules,
+		);
+
+		const result = japanInheritanceTaxService.calculate();
 
 		return result;
 	}

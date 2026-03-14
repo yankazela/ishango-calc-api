@@ -21,6 +21,14 @@ export class ProcessIncomeTaxInputServiceImpl extends BaseCalculatorService impl
 					return (await this.processUKIncomeTax(data, isPrivate)) as T;
 				case 'ge':
 					return (await this.processGermanyIncomeTax(data, isPrivate)) as T;
+				case 'br':
+					return (await this.processBrazilIncomeTax(data, isPrivate)) as T;
+				case 'es':
+					return (await this.processSpainIncomeTax(data, isPrivate)) as T;
+				case 'in':
+					return (await this.processIndiaIncomeTax(data, isPrivate)) as T;
+				case 'jp':
+					return (await this.processJapanIncomeTax(data, isPrivate)) as T;
 				default:
 					throw new Error(`Unsupported country: ${data.countryCode}`);
 			}
@@ -206,6 +214,110 @@ export class ProcessIncomeTaxInputServiceImpl extends BaseCalculatorService impl
 				grossIncome: result.grossIncome,
 				netIncome: result.netIncome,
 				incomeTax: result.incomeTax,
+				taxBracketBreakdown: result.taxBracketBreakdown,
+			};
+		}
+
+		return result;
+	}
+
+	async processBrazilIncomeTax(
+		data: IncomeTaxRequest,
+		isPrivate: boolean,
+	): Promise<IncomeTax.BrazilComputedIncomeTaxValues | IncomeTaxPrivateResponse> {
+		const countryRules = await this.getCountryRules<IncomeTax.BrazilIncomeTaxRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.INCOME_TAX,
+		);
+
+		const brazilIncomeTaxService = new IncomeTax.BrazilIncomeTaxService(data.income, countryRules);
+
+		const result = brazilIncomeTaxService.calculateNetIncome();
+
+		if (isPrivate) {
+			return {
+				grossIncome: result.grossIncome,
+				netIncome: result.netIncome,
+				incomeTax: result.incomeTax,
+				taxBracketBreakdown: result.taxBracketBreakdown,
+			};
+		}
+
+		return result;
+	}
+
+	async processSpainIncomeTax(
+		data: IncomeTaxRequest,
+		isPrivate: boolean,
+	): Promise<IncomeTax.SpainComputedIncomeTaxValues | IncomeTaxPrivateResponse> {
+		const countryRules = await this.getCountryRules<IncomeTax.SpainIncomeTaxRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.INCOME_TAX,
+		);
+
+		const spainIncomeTaxService = new IncomeTax.SpainIncomeTaxService(data.income, countryRules);
+
+		const result = spainIncomeTaxService.calculateNetIncome();
+
+		if (isPrivate) {
+			return {
+				grossIncome: result.grossIncome,
+				netIncome: result.netIncome,
+				incomeTax: result.incomeTax,
+				taxBracketBreakdown: result.taxBracketBreakdown,
+			};
+		}
+
+		return result;
+	}
+
+	async processIndiaIncomeTax(
+		data: IncomeTaxRequest,
+		isPrivate: boolean,
+	): Promise<IncomeTax.IndiaComputedIncomeTaxValues | IncomeTaxPrivateResponse> {
+		const countryRules = await this.getCountryRules<IncomeTax.IndiaIncomeTaxRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.INCOME_TAX,
+		);
+
+		const indiaIncomeTaxService = new IncomeTax.IndiaIncomeTaxService(data.income, countryRules);
+
+		const result = indiaIncomeTaxService.calculateNetIncome();
+
+		if (isPrivate) {
+			return {
+				grossIncome: result.grossIncome,
+				netIncome: result.netIncome,
+				incomeTax: result.incomeTax,
+				taxBracketBreakdown: result.taxBracketBreakdown,
+			};
+		}
+
+		return result;
+	}
+
+	async processJapanIncomeTax(
+		data: IncomeTaxRequest,
+		isPrivate: boolean,
+	): Promise<IncomeTax.JapanComputedIncomeTaxValues | IncomeTaxPrivateResponse> {
+		const countryRules = await this.getCountryRules<IncomeTax.JapanIncomeTaxRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.INCOME_TAX,
+		);
+
+		const japanIncomeTaxService = new IncomeTax.JapanIncomeTaxService(data.income, countryRules);
+
+		const result = japanIncomeTaxService.calculateNetIncome();
+
+		if (isPrivate) {
+			return {
+				grossIncome: result.grossIncome,
+				netIncome: result.netIncome,
+				incomeTax: result.nationalIncomeTax,
 				taxBracketBreakdown: result.taxBracketBreakdown,
 			};
 		}

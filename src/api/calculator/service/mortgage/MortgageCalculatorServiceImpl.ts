@@ -21,6 +21,14 @@ export class MortgageCalculatorServiceImpl extends BaseCalculatorService impleme
 					return (await this.processUKMortgage(data)) as T;
 				case 'ge':
 					return (await this.processGermanyMortgage(data)) as T;
+				case 'br':
+					return (await this.processBrazilMortgage(data)) as T;
+				case 'es':
+					return (await this.processSpainMortgage(data)) as T;
+				case 'in':
+					return (await this.processIndiaMortgage(data)) as T;
+				case 'jp':
+					return (await this.processJapanMortgage(data)) as T;
 				default:
 					throw new Error(`Unsupported country: ${data.countryCode}`);
 			}
@@ -185,5 +193,93 @@ export class MortgageCalculatorServiceImpl extends BaseCalculatorService impleme
 		const germanyMortgageService = new Mortgage.GermanyMortgageService();
 
 		return germanyMortgageService.calculate(input, countryRules);
+	}
+
+	async processBrazilMortgage(data: MortgageRequest): Promise<Mortgage.BrazilMortgageOutput> {
+		const { propertyPrice, downPayment, interestRate, amortizationYears, isFirstTimeBuyer } = data.details;
+
+		const input: Mortgage.BrazilMortgageInput = {
+			propertyPrice,
+			downPayment,
+			annualInterestRate: interestRate,
+			amortizationYears,
+			isFirstTimeBuyer: isFirstTimeBuyer || false,
+		};
+
+		const countryRules = await this.getCountryRules<Mortgage.BrazilMortgageRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.MORTGAGE,
+		);
+
+		const brazilMortgageService = new Mortgage.BrazilMortgageService();
+
+		return brazilMortgageService.calculate(input, countryRules);
+	}
+
+	async processSpainMortgage(data: MortgageRequest): Promise<Mortgage.SpainMortgageOutput> {
+		const { propertyPrice, downPayment, interestRate, amortizationYears, isFirstTimeBuyer } = data.details;
+
+		const input: Mortgage.SpainMortgageInput = {
+			propertyPrice,
+			downPayment,
+			annualInterestRate: interestRate,
+			amortizationYears,
+			isFirstTimeBuyer: isFirstTimeBuyer || false,
+		};
+
+		const countryRules = await this.getCountryRules<Mortgage.SpainMortgageRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.MORTGAGE,
+		);
+
+		const spainMortgageService = new Mortgage.SpainMortgageService();
+
+		return spainMortgageService.calculate(input, countryRules);
+	}
+
+	async processIndiaMortgage(data: MortgageRequest): Promise<Mortgage.IndiaMortgageOutput> {
+		const { propertyPrice, downPayment, interestRate, amortizationYears, isFirstTimeBuyer } = data.details;
+
+		const input: Mortgage.IndiaMortgageInput = {
+			propertyPrice,
+			downPayment,
+			annualInterestRate: interestRate,
+			amortizationYears,
+			isFirstTimeBuyer: isFirstTimeBuyer || false,
+		};
+
+		const countryRules = await this.getCountryRules<Mortgage.IndiaMortgageRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.MORTGAGE,
+		);
+
+		const indiaMortgageService = new Mortgage.IndiaMortgageService();
+
+		return indiaMortgageService.calculate(input, countryRules);
+	}
+
+	async processJapanMortgage(data: MortgageRequest): Promise<Mortgage.JapanMortgageOutput> {
+		const { propertyPrice, downPayment, interestRate, amortizationYears, isFirstTimeBuyer } = data.details;
+
+		const input: Mortgage.JapanMortgageInput = {
+			propertyPrice,
+			downPayment,
+			annualInterestRate: interestRate,
+			amortizationYears,
+			isFirstTimeBuyer: isFirstTimeBuyer || false,
+		};
+
+		const countryRules = await this.getCountryRules<Mortgage.JapanMortgageRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.MORTGAGE,
+		);
+
+		const japanMortgageService = new Mortgage.JapanMortgageService();
+
+		return japanMortgageService.calculate(input, countryRules);
 	}
 }

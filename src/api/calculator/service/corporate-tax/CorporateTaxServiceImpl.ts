@@ -21,6 +21,14 @@ export class CorporateTaxServiceImpl extends BaseCalculatorService implements Co
 					return this.processUKCorporateTax(data) as Promise<T>;
 				case 'ge':
 					return this.processGermanyCorporateTax(data) as Promise<T>;
+				case 'br':
+					return this.processBrazilCorporateTax(data) as Promise<T>;
+				case 'es':
+					return this.processSpainCorporateTax(data) as Promise<T>;
+				case 'in':
+					return this.processIndiaCorporateTax(data) as Promise<T>;
+				case 'jp':
+					return this.processJapanCorporateTax(data) as Promise<T>;
 				default:
 					throw new Error(`Unsupported country: ${data.countryCode}`);
 			}
@@ -151,6 +159,78 @@ export class CorporateTaxServiceImpl extends BaseCalculatorService implements Co
 
 		return {
 			federalTax: germanyService.calculate(),
+		};
+	}
+
+	private async processBrazilCorporateTax(data: CorporateTaxRequest): Promise<CorporateTaxResponse> {
+		const countryRules = await this.getCountryRules<CorporateTax.BrazilCorporateTaxRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.CORPORATE_TAX,
+		);
+
+		const brazilInput: CorporateTax.BrazilCorporateTaxInput = {
+			taxableIncome: data.details.taxableIncome,
+		};
+
+		const brazilService = new CorporateTax.BrazilCorporateTaxService(brazilInput, countryRules);
+
+		return {
+			federalTax: brazilService.calculate(),
+		};
+	}
+
+	private async processSpainCorporateTax(data: CorporateTaxRequest): Promise<CorporateTaxResponse> {
+		const countryRules = await this.getCountryRules<CorporateTax.SpainCorporateTaxRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.CORPORATE_TAX,
+		);
+
+		const spainInput: CorporateTax.SpainCorporateTaxInput = {
+			taxableIncome: data.details.taxableIncome,
+		};
+
+		const spainService = new CorporateTax.SpainCorporateTaxService(spainInput, countryRules);
+
+		return {
+			federalTax: spainService.calculate(),
+		};
+	}
+
+	private async processIndiaCorporateTax(data: CorporateTaxRequest): Promise<CorporateTaxResponse> {
+		const countryRules = await this.getCountryRules<CorporateTax.IndiaCorporateTaxRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.CORPORATE_TAX,
+		);
+
+		const indiaInput: CorporateTax.IndiaCorporateTaxInput = {
+			taxableIncome: data.details.taxableIncome,
+		};
+
+		const indiaService = new CorporateTax.IndiaCorporateTaxService(indiaInput, countryRules);
+
+		return {
+			federalTax: indiaService.calculate(),
+		};
+	}
+
+	private async processJapanCorporateTax(data: CorporateTaxRequest): Promise<CorporateTaxResponse> {
+		const countryRules = await this.getCountryRules<CorporateTax.JapanCorporateTaxRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.CORPORATE_TAX,
+		);
+
+		const japanInput: CorporateTax.JapanCorporateTaxInput = {
+			taxableIncome: data.details.taxableIncome,
+		};
+
+		const japanService = new CorporateTax.JapanCorporateTaxService(japanInput, countryRules);
+
+		return {
+			federalTax: japanService.calculate(),
 		};
 	}
 }

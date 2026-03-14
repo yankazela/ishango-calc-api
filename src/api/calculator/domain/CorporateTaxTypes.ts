@@ -19,12 +19,20 @@ export interface CorporateTaxResponse {
 		| CorporateTax.SouthAfricaCorporateTaxResult
 		| CorporateTax.AustraliaCorporateTaxResult
 		| CorporateTax.UKCorporateTaxResult
-		| CorporateTax.GermanyCorporateTaxResult;
+		| CorporateTax.GermanyCorporateTaxResult
+		| CorporateTax.BrazilCorporateTaxResult
+		| CorporateTax.SpainCorporateTaxResult
+		| CorporateTax.IndiaCorporateTaxResult
+		| CorporateTax.JapanCorporateTaxResult;
 	provincialTax?:
 		| CorporateTax.CanadaCorporateTaxResult
 		| CorporateTax.FranceCorporateTaxResult
 		| CorporateTax.SouthAfricaCorporateTaxResult
 		| CorporateTax.AustraliaCorporateTaxResult
 		| CorporateTax.UKCorporateTaxResult
-		| CorporateTax.GermanyCorporateTaxResult;
+		| CorporateTax.GermanyCorporateTaxResult
+		| CorporateTax.BrazilCorporateTaxResult
+		| CorporateTax.SpainCorporateTaxResult
+		| CorporateTax.IndiaCorporateTaxResult
+		| CorporateTax.JapanCorporateTaxResult;
 }

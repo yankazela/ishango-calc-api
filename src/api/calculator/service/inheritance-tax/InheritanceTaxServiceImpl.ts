@@ -11,14 +11,10 @@ export class InheritanceTaxServiceImpl extends BaseCalculatorService implements 
 	processInheritanceTax<T>(data: InheritanceTaxRequest): Promise<T> {
 		try {
 			switch (data.countryCode.toLocaleLowerCase()) {
-				case 'ca':
-					return this.processCanadaInheritanceTax(data) as Promise<T>;
 				case 'fr':
 					return this.processFranceInheritanceTax(data) as Promise<T>;
 				case 'za':
 					return this.processSouthAfricaInheritanceTax(data) as Promise<T>;
-				case 'au':
-					return this.processAustraliaInheritanceTax(data) as Promise<T>;
 				case 'uk':
 					return this.processUKInheritanceTax(data) as Promise<T>;
 				case 'us':
@@ -31,28 +27,6 @@ export class InheritanceTaxServiceImpl extends BaseCalculatorService implements 
 		} catch (error) {
 			throw new Error(`Error processing calculator input: ${(error as Error).message}`);
 		}
-	}
-
-	private async processCanadaInheritanceTax(
-		data: InheritanceTaxRequest,
-	): Promise<InheritanceTax.CanadaInheritanceTaxResult> {
-		const countryRules = await this.getCountryRules<InheritanceTax.CanadaInheritanceTaxRules>(
-			data.countryCode,
-			data.year,
-			CalculatorType.INHERITANCE_TAX,
-		);
-
-		const canadaInheritanceTaxService = new InheritanceTax.CanadaInheritanceTaxService(
-			{
-				estateValue: data.details.estateValue,
-				adjustedCostBase: data.details.adjustedCostBase || 0,
-			},
-			countryRules,
-		);
-
-		const result = canadaInheritanceTaxService.calculate();
-
-		return result;
 	}
 
 	private async processFranceInheritanceTax(
@@ -96,27 +70,6 @@ export class InheritanceTaxServiceImpl extends BaseCalculatorService implements 
 		);
 
 		const result = southAfricaInheritanceTaxService.calculate();
-
-		return result;
-	}
-
-	private async processAustraliaInheritanceTax(
-		data: InheritanceTaxRequest,
-	): Promise<InheritanceTax.AustraliaInheritanceTaxResult> {
-		const countryRules = await this.getCountryRules<InheritanceTax.AustraliaInheritanceTaxRules>(
-			data.countryCode,
-			data.year,
-			CalculatorType.INHERITANCE_TAX,
-		);
-
-		const australiaInheritanceTaxService = new InheritanceTax.AustraliaInheritanceTaxService(
-			{
-				estateValue: data.details.estateValue,
-			},
-			countryRules,
-		);
-
-		const result = australiaInheritanceTaxService.calculate();
 
 		return result;
 	}

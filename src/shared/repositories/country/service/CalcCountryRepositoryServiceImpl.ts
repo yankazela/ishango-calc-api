@@ -24,6 +24,7 @@ export class CalcCountryRepositoryServiceImpl implements CalcCountryRepositorySe
 			.leftJoinAndSelect('cc.CalculatorType', 'calculatorType')
 			.where('LOWER(calculatorType.Name) = LOWER(:calculatorTypeName)', { calculatorTypeName })
 			.andWhere('cc.Year = :year', { year })
+			.andWhere('cc.DisabledAt IS NULL') // Exclude disabled calculator countries
 			.getMany();
 
 		const results: GetCalCountriesResponse[] = await Promise.all(
@@ -104,6 +105,7 @@ export class CalcCountryRepositoryServiceImpl implements CalcCountryRepositorySe
 			.createQueryBuilder('cc')
 			.leftJoinAndSelect('cc.Country', 'country')
 			.leftJoinAndSelect('cc.CalculatorType', 'calculatorType')
+			.where('cc.DisabledAt IS NULL') // Exclude disabled calculator countries
 			.getMany();
 
 		// Group by country to get unique countries with their calculators

@@ -21,13 +21,49 @@ SET time_zone = "+00:00";
 -- Database: `Ishango_SAAS`
 --
 
+-- =============================================
+-- Helper procedures for idempotent index/constraint creation
+-- =============================================
+
+DROP PROCEDURE IF EXISTS `AddIndexIfNotExists`;
+DELIMITER //
+CREATE PROCEDURE `AddIndexIfNotExists`(IN p_table VARCHAR(64), IN p_index VARCHAR(64), IN p_sql TEXT)
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = p_table AND INDEX_NAME = p_index LIMIT 1
+  ) THEN
+    SET @ddl = p_sql;
+    PREPARE stmt FROM @ddl;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+  END IF;
+END //
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS `AddConstraintIfNotExists`;
+DELIMITER //
+CREATE PROCEDURE `AddConstraintIfNotExists`(IN p_table VARCHAR(64), IN p_constraint VARCHAR(64), IN p_sql TEXT)
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.TABLE_CONSTRAINTS
+    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = p_table AND CONSTRAINT_NAME = p_constraint LIMIT 1
+  ) THEN
+    SET @ddl = p_sql;
+    PREPARE stmt FROM @ddl;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+  END IF;
+END //
+DELIMITER ;
+
 -- --------------------------------------------------------
 
 --
 -- Table structure for table `calculator_countries`
 --
 
-CREATE TABLE `calculator_countries` (
+CREATE TABLE IF NOT EXISTS `calculator_countries` (
   `ID` varchar(50) NOT NULL,
   `CalculatorTypeID` varchar(50) NOT NULL,
   `CountryID` varchar(50) NOT NULL,
@@ -96,7 +132,7 @@ INSERT INTO `calculator_countries` (`ID`, `CalculatorTypeID`, `CountryID`, `Json
 -- Table structure for table `calculator_provinces`
 --
 
-CREATE TABLE `calculator_provinces` (
+CREATE TABLE IF NOT EXISTS `calculator_provinces` (
   `ID` varchar(50) NOT NULL,
   `CalculatorTypeID` varchar(50) NOT NULL,
   `ProvinceID` varchar(50) NOT NULL,
@@ -120,7 +156,7 @@ INSERT INTO `calculator_provinces` (`ID`, `CalculatorTypeID`, `ProvinceID`, `Jso
 -- Table structure for table `calculator_types`
 --
 
-CREATE TABLE `calculator_types` (
+CREATE TABLE IF NOT EXISTS `calculator_types` (
   `ID` varchar(50) NOT NULL,
   `Name` varchar(100) NOT NULL,
   `Description` varchar(100) NOT NULL,
@@ -145,7 +181,7 @@ INSERT INTO `calculator_types` (`ID`, `Name`, `Description`, `CreatedAt`, `Disab
 -- Table structure for table `clients`
 --
 
-CREATE TABLE `clients` (
+CREATE TABLE IF NOT EXISTS `clients` (
   `ID` varchar(50) NOT NULL,
   `Firstname` varchar(100) NOT NULL,
   `Lastname` varchar(100) NOT NULL,
@@ -175,7 +211,7 @@ INSERT INTO `clients` (`ID`, `Firstname`, `Lastname`, `Email`, `Phone`, `Country
 -- Table structure for table `countries`
 --
 
-CREATE TABLE `countries` (
+CREATE TABLE IF NOT EXISTS `countries` (
   `ID` varchar(50) NOT NULL,
   `Name` varchar(100) NOT NULL,
   `Code` varchar(10) NOT NULL,
@@ -208,7 +244,7 @@ INSERT INTO `countries` (`ID`, `Name`, `Code`, `FlagUrl`, `Currency`, `CurrencyS
 -- Table structure for table `expertise_countries`
 --
 
-CREATE TABLE `expertise_countries` (
+CREATE TABLE IF NOT EXISTS `expertise_countries` (
   `ID` varchar(50) NOT NULL,
   `ExpertID` varchar(50) NOT NULL,
   `CalculatorCountryID` varchar(50) NOT NULL,
@@ -247,7 +283,7 @@ INSERT INTO `expertise_countries` (`ID`, `ExpertID`, `CalculatorCountryID`, `Cre
 -- Table structure for table `experts`
 --
 
-CREATE TABLE `experts` (
+CREATE TABLE IF NOT EXISTS `experts` (
   `ID` varchar(50) NOT NULL,
   `Name` varchar(50) NOT NULL,
   `Email` varchar(50) NOT NULL,
@@ -291,7 +327,7 @@ INSERT INTO `experts` (`ID`, `Name`, `Email`, `Phone`, `Bio`, `ProfilePictureUrl
 -- Table structure for table `expert_statuses`
 --
 
-CREATE TABLE `expert_statuses` (
+CREATE TABLE IF NOT EXISTS `expert_statuses` (
   `ID` varchar(50) NOT NULL,
   `Description` varchar(100) NOT NULL,
   `Code` varchar(20) NOT NULL,
@@ -313,7 +349,7 @@ INSERT INTO `expert_statuses` (`ID`, `Description`, `Code`, `CreatedAt`, `Disabl
 -- Table structure for table `expert_types`
 --
 
-CREATE TABLE `expert_types` (
+CREATE TABLE IF NOT EXISTS `expert_types` (
   `ID` varchar(50) NOT NULL,
   `Code` varchar(100) NOT NULL,
   `Name` varchar(100) NOT NULL,
@@ -335,7 +371,7 @@ INSERT INTO `expert_types` (`ID`, `Code`, `Name`, `CreatedAt`, `DisabledAt`) VAL
 -- Table structure for table `fx_rates`
 --
 
-CREATE TABLE `fx_rates` (
+CREATE TABLE IF NOT EXISTS `fx_rates` (
   `ID` varchar(50) NOT NULL,
   `BaseCurrency` varchar(6) NOT NULL,
   `QuoteCurrency` varchar(6) NOT NULL,
@@ -362,7 +398,7 @@ INSERT INTO `fx_rates` (`ID`, `BaseCurrency`, `QuoteCurrency`, `Rate`, `CreatedA
 -- Table structure for table `payments`
 --
 
-CREATE TABLE `payments` (
+CREATE TABLE IF NOT EXISTS `payments` (
   `ID` varchar(50) NOT NULL,
   `SubscriptionID` varchar(50) NOT NULL,
   `Amount` decimal(10,2) NOT NULL,
@@ -380,7 +416,7 @@ CREATE TABLE `payments` (
 -- Table structure for table `payment_frequencies`
 --
 
-CREATE TABLE `payment_frequencies` (
+CREATE TABLE IF NOT EXISTS `payment_frequencies` (
   `ID` varchar(50) NOT NULL,
   `Description` varchar(100) NOT NULL,
   `Code` varchar(20) NOT NULL,
@@ -402,7 +438,7 @@ INSERT INTO `payment_frequencies` (`ID`, `Description`, `Code`, `CreatedAt`, `Di
 -- Table structure for table `payment_statuses`
 --
 
-CREATE TABLE `payment_statuses` (
+CREATE TABLE IF NOT EXISTS `payment_statuses` (
   `ID` varchar(50) NOT NULL,
   `Description` varchar(100) NOT NULL,
   `Code` varchar(20) NOT NULL,
@@ -427,7 +463,7 @@ INSERT INTO `payment_statuses` (`ID`, `Description`, `Code`, `CreatedAt`, `Disab
 -- Table structure for table `plans`
 --
 
-CREATE TABLE `plans` (
+CREATE TABLE IF NOT EXISTS `plans` (
   `ID` varchar(50) NOT NULL,
   `Description` varchar(100) NOT NULL,
   `Code` varchar(20) NOT NULL,
@@ -456,7 +492,7 @@ INSERT INTO `plans` (`ID`, `Description`, `Code`, `MaxApiCalculationsPerMonth`, 
 -- Table structure for table `plan_prices`
 --
 
-CREATE TABLE `plan_prices` (
+CREATE TABLE IF NOT EXISTS `plan_prices` (
   `ID` varchar(50) NOT NULL,
   `PlanID` varchar(50) NOT NULL,
   `RegionID` varchar(50) NOT NULL,
@@ -489,7 +525,7 @@ INSERT INTO `plan_prices` (`ID`, `PlanID`, `RegionID`, `Price`, `CreatedAt`, `Di
 -- Table structure for table `provinces`
 --
 
-CREATE TABLE `provinces` (
+CREATE TABLE IF NOT EXISTS `provinces` (
   `ID` varchar(50) NOT NULL,
   `Name` varchar(100) NOT NULL,
   `Code` varchar(10) NOT NULL,
@@ -523,7 +559,7 @@ INSERT INTO `provinces` (`ID`, `Name`, `Code`, `CountryID`, `CreatedAt`, `Disabl
 -- Table structure for table `regions`
 --
 
-CREATE TABLE `regions` (
+CREATE TABLE IF NOT EXISTS `regions` (
   `ID` varchar(50) NOT NULL,
   `Name` varchar(100) NOT NULL,
   `Code` varchar(50) NOT NULL,
@@ -550,7 +586,7 @@ INSERT INTO `regions` (`ID`, `Name`, `Code`, `Currency`, `CreatedAt`, `DisabledA
 -- Table structure for table `subscriptions`
 --
 
-CREATE TABLE `subscriptions` (
+CREATE TABLE IF NOT EXISTS `subscriptions` (
   `ID` varchar(50) NOT NULL,
   `StartDate` varchar(20) NOT NULL,
   `CurrentCost` decimal(10,2) NOT NULL,
@@ -578,7 +614,7 @@ INSERT INTO `subscriptions` (`ID`, `StartDate`, `CurrentCost`, `CurrencyRegionCo
 -- Table structure for table `subscription_cost_history`
 --
 
-CREATE TABLE `subscription_cost_history` (
+CREATE TABLE IF NOT EXISTS `subscription_cost_history` (
   `ID` varchar(50) NOT NULL,
   `SubscriptionID` varchar(50) NOT NULL,
   `PlanID` varchar(50) NOT NULL,
@@ -594,7 +630,7 @@ CREATE TABLE `subscription_cost_history` (
 -- Table structure for table `subscription_statuses`
 --
 
-CREATE TABLE `subscription_statuses` (
+CREATE TABLE IF NOT EXISTS `subscription_statuses` (
   `ID` varchar(50) NOT NULL,
   `Description` varchar(100) NOT NULL,
   `Code` varchar(20) NOT NULL,
@@ -612,220 +648,136 @@ INSERT INTO `subscription_statuses` (`ID`, `Description`, `Code`, `CreatedAt`, `
 ('cd892490-c37e-43a0-8ac2-bf5ef4f06c59', 'Active', 'ACTIVE', '', NULL);
 
 --
--- Indexes for dumped tables
+-- Indexes for dumped tables (idempotent — skips if already exists)
 --
 
---
--- Indexes for table `calculator_countries`
---
-ALTER TABLE `calculator_countries`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_6292ab3c1f4ff07bf3a3e5062e5` (`CountryID`),
-  ADD KEY `FK_c64e05f5b4ba491201748d4bf26` (`CalculatorTypeID`);
+-- calculator_countries
+CALL AddIndexIfNotExists('calculator_countries', 'PRIMARY', 'ALTER TABLE `calculator_countries` ADD PRIMARY KEY (`ID`)');
+CALL AddIndexIfNotExists('calculator_countries', 'FK_6292ab3c1f4ff07bf3a3e5062e5', 'ALTER TABLE `calculator_countries` ADD KEY `FK_6292ab3c1f4ff07bf3a3e5062e5` (`CountryID`)');
+CALL AddIndexIfNotExists('calculator_countries', 'FK_c64e05f5b4ba491201748d4bf26', 'ALTER TABLE `calculator_countries` ADD KEY `FK_c64e05f5b4ba491201748d4bf26` (`CalculatorTypeID`)');
+
+-- calculator_provinces
+CALL AddIndexIfNotExists('calculator_provinces', 'PRIMARY', 'ALTER TABLE `calculator_provinces` ADD PRIMARY KEY (`ID`)');
+CALL AddIndexIfNotExists('calculator_provinces', 'FK_03a0eea008eb4ca1ab48a0ca796', 'ALTER TABLE `calculator_provinces` ADD KEY `FK_03a0eea008eb4ca1ab48a0ca796` (`ProvinceID`)');
+CALL AddIndexIfNotExists('calculator_provinces', 'FK_1cab8e93ef3d00d2ee6bdc5e9c2', 'ALTER TABLE `calculator_provinces` ADD KEY `FK_1cab8e93ef3d00d2ee6bdc5e9c2` (`CalculatorTypeID`)');
+
+-- calculator_types
+CALL AddIndexIfNotExists('calculator_types', 'PRIMARY', 'ALTER TABLE `calculator_types` ADD PRIMARY KEY (`ID`)');
+
+-- clients
+CALL AddIndexIfNotExists('clients', 'PRIMARY', 'ALTER TABLE `clients` ADD PRIMARY KEY (`ID`)');
+CALL AddIndexIfNotExists('clients', 'REL_8e5f1736af0c63dede1ebb3d96', 'ALTER TABLE `clients` ADD UNIQUE KEY `REL_8e5f1736af0c63dede1ebb3d96` (`SubscriptionId`)');
+
+-- countries
+CALL AddIndexIfNotExists('countries', 'PRIMARY', 'ALTER TABLE `countries` ADD PRIMARY KEY (`ID`)');
+
+-- expertise_countries
+CALL AddIndexIfNotExists('expertise_countries', 'PRIMARY', 'ALTER TABLE `expertise_countries` ADD PRIMARY KEY (`ID`)');
+CALL AddIndexIfNotExists('expertise_countries', 'FK_d7ab0f5de497fc435a3d0a91cdd', 'ALTER TABLE `expertise_countries` ADD KEY `FK_d7ab0f5de497fc435a3d0a91cdd` (`ExpertID`)');
+CALL AddIndexIfNotExists('expertise_countries', 'FK_a6271a8878edda40999d505fdb2', 'ALTER TABLE `expertise_countries` ADD KEY `FK_a6271a8878edda40999d505fdb2` (`CalculatorCountryID`)');
+
+-- experts
+CALL AddIndexIfNotExists('experts', 'PRIMARY', 'ALTER TABLE `experts` ADD PRIMARY KEY (`ID`)');
+CALL AddIndexIfNotExists('experts', 'FK_6ad235fcff122997f1e497139df', 'ALTER TABLE `experts` ADD KEY `FK_6ad235fcff122997f1e497139df` (`ExpertStatusID`)');
+CALL AddIndexIfNotExists('experts', 'FK_694cddab18f832b25c098861aa0', 'ALTER TABLE `experts` ADD KEY `FK_694cddab18f832b25c098861aa0` (`ExpertTypeID`)');
+
+-- expert_statuses
+CALL AddIndexIfNotExists('expert_statuses', 'PRIMARY', 'ALTER TABLE `expert_statuses` ADD PRIMARY KEY (`ID`)');
+
+-- expert_types
+CALL AddIndexIfNotExists('expert_types', 'PRIMARY', 'ALTER TABLE `expert_types` ADD PRIMARY KEY (`ID`)');
+
+-- fx_rates
+CALL AddIndexIfNotExists('fx_rates', 'PRIMARY', 'ALTER TABLE `fx_rates` ADD PRIMARY KEY (`ID`)');
+
+-- payments
+CALL AddIndexIfNotExists('payments', 'PRIMARY', 'ALTER TABLE `payments` ADD PRIMARY KEY (`ID`)');
+CALL AddIndexIfNotExists('payments', 'FK_b1e3064068e1a05d37af0fec86a', 'ALTER TABLE `payments` ADD KEY `FK_b1e3064068e1a05d37af0fec86a` (`SubscriptionID`)');
+CALL AddIndexIfNotExists('payments', 'FK_c9bf69bfc7ca9ea82aee7091708', 'ALTER TABLE `payments` ADD KEY `FK_c9bf69bfc7ca9ea82aee7091708` (`StatusId`)');
+
+-- payment_frequencies
+CALL AddIndexIfNotExists('payment_frequencies', 'PRIMARY', 'ALTER TABLE `payment_frequencies` ADD PRIMARY KEY (`ID`)');
+
+-- payment_statuses
+CALL AddIndexIfNotExists('payment_statuses', 'PRIMARY', 'ALTER TABLE `payment_statuses` ADD PRIMARY KEY (`ID`)');
+
+-- plans
+CALL AddIndexIfNotExists('plans', 'PRIMARY', 'ALTER TABLE `plans` ADD PRIMARY KEY (`ID`)');
+
+-- plan_prices
+CALL AddIndexIfNotExists('plan_prices', 'PRIMARY', 'ALTER TABLE `plan_prices` ADD PRIMARY KEY (`ID`)');
+CALL AddIndexIfNotExists('plan_prices', 'FK_09bd528f83f3908d5fad945e81f', 'ALTER TABLE `plan_prices` ADD KEY `FK_09bd528f83f3908d5fad945e81f` (`PlanID`)');
+CALL AddIndexIfNotExists('plan_prices', 'FK_46cfee5eb5534e1e3256332f606', 'ALTER TABLE `plan_prices` ADD KEY `FK_46cfee5eb5534e1e3256332f606` (`RegionID`)');
+
+-- provinces
+CALL AddIndexIfNotExists('provinces', 'PRIMARY', 'ALTER TABLE `provinces` ADD PRIMARY KEY (`ID`)');
+CALL AddIndexIfNotExists('provinces', 'FK_8c1f4aad8475be025242b8b0e57', 'ALTER TABLE `provinces` ADD KEY `FK_8c1f4aad8475be025242b8b0e57` (`CountryID`)');
+
+-- regions
+CALL AddIndexIfNotExists('regions', 'PRIMARY', 'ALTER TABLE `regions` ADD PRIMARY KEY (`ID`)');
+
+-- subscriptions
+CALL AddIndexIfNotExists('subscriptions', 'PRIMARY', 'ALTER TABLE `subscriptions` ADD PRIMARY KEY (`ID`)');
+CALL AddIndexIfNotExists('subscriptions', 'FK_c72d661e6de8eb5820b6c6ea9e0', 'ALTER TABLE `subscriptions` ADD KEY `FK_c72d661e6de8eb5820b6c6ea9e0` (`PlanId`)');
+CALL AddIndexIfNotExists('subscriptions', 'FK_1422f649c9c8c83ef5a675e0aff', 'ALTER TABLE `subscriptions` ADD KEY `FK_1422f649c9c8c83ef5a675e0aff` (`PaymentFrequencyId`)');
+CALL AddIndexIfNotExists('subscriptions', 'FK_38a821d7b1cc006b3aea7fb8d10', 'ALTER TABLE `subscriptions` ADD KEY `FK_38a821d7b1cc006b3aea7fb8d10` (`StatusId`)');
+
+-- subscription_cost_history
+CALL AddIndexIfNotExists('subscription_cost_history', 'PRIMARY', 'ALTER TABLE `subscription_cost_history` ADD PRIMARY KEY (`ID`)');
+CALL AddIndexIfNotExists('subscription_cost_history', 'FK_3d117809e14d93b8664ce50c9d6', 'ALTER TABLE `subscription_cost_history` ADD KEY `FK_3d117809e14d93b8664ce50c9d6` (`SubscriptionID`)');
+CALL AddIndexIfNotExists('subscription_cost_history', 'FK_ef5f6c8a3d3b5ed301d4db0a112', 'ALTER TABLE `subscription_cost_history` ADD KEY `FK_ef5f6c8a3d3b5ed301d4db0a112` (`PlanID`)');
+
+-- subscription_statuses
+CALL AddIndexIfNotExists('subscription_statuses', 'PRIMARY', 'ALTER TABLE `subscription_statuses` ADD PRIMARY KEY (`ID`)');
 
 --
--- Indexes for table `calculator_provinces`
---
-ALTER TABLE `calculator_provinces`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_03a0eea008eb4ca1ab48a0ca796` (`ProvinceID`),
-  ADD KEY `FK_1cab8e93ef3d00d2ee6bdc5e9c2` (`CalculatorTypeID`);
-
---
--- Indexes for table `calculator_types`
---
-ALTER TABLE `calculator_types`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `clients`
---
-ALTER TABLE `clients`
-  ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `REL_8e5f1736af0c63dede1ebb3d96` (`SubscriptionId`);
-
---
--- Indexes for table `countries`
---
-ALTER TABLE `countries`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `expertise_countries`
---
-ALTER TABLE `expertise_countries`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_d7ab0f5de497fc435a3d0a91cdd` (`ExpertID`),
-  ADD KEY `FK_a6271a8878edda40999d505fdb2` (`CalculatorCountryID`);
-
---
--- Indexes for table `experts`
---
-ALTER TABLE `experts`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_6ad235fcff122997f1e497139df` (`ExpertStatusID`),
-  ADD KEY `FK_694cddab18f832b25c098861aa0` (`ExpertTypeID`);
-
---
--- Indexes for table `expert_statuses`
---
-ALTER TABLE `expert_statuses`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `expert_types`
---
-ALTER TABLE `expert_types`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `fx_rates`
---
-ALTER TABLE `fx_rates`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `payments`
---
-ALTER TABLE `payments`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_b1e3064068e1a05d37af0fec86a` (`SubscriptionID`),
-  ADD KEY `FK_c9bf69bfc7ca9ea82aee7091708` (`StatusId`);
-
---
--- Indexes for table `payment_frequencies`
---
-ALTER TABLE `payment_frequencies`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `payment_statuses`
---
-ALTER TABLE `payment_statuses`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `plans`
---
-ALTER TABLE `plans`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `plan_prices`
---
-ALTER TABLE `plan_prices`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_09bd528f83f3908d5fad945e81f` (`PlanID`),
-  ADD KEY `FK_46cfee5eb5534e1e3256332f606` (`RegionID`);
-
---
--- Indexes for table `provinces`
---
-ALTER TABLE `provinces`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_8c1f4aad8475be025242b8b0e57` (`CountryID`);
-
---
--- Indexes for table `regions`
---
-ALTER TABLE `regions`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `subscriptions`
---
-ALTER TABLE `subscriptions`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_c72d661e6de8eb5820b6c6ea9e0` (`PlanId`),
-  ADD KEY `FK_1422f649c9c8c83ef5a675e0aff` (`PaymentFrequencyId`),
-  ADD KEY `FK_38a821d7b1cc006b3aea7fb8d10` (`StatusId`);
-
---
--- Indexes for table `subscription_cost_history`
---
-ALTER TABLE `subscription_cost_history`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_3d117809e14d93b8664ce50c9d6` (`SubscriptionID`),
-  ADD KEY `FK_ef5f6c8a3d3b5ed301d4db0a112` (`PlanID`);
-
---
--- Indexes for table `subscription_statuses`
---
-ALTER TABLE `subscription_statuses`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Constraints for dumped tables
+-- Constraints for dumped tables (idempotent — skips if already exists)
 --
 
---
--- Constraints for table `calculator_countries`
---
-ALTER TABLE `calculator_countries`
-  ADD CONSTRAINT `FK_6292ab3c1f4ff07bf3a3e5062e5` FOREIGN KEY (`CountryID`) REFERENCES `countries` (`ID`),
-  ADD CONSTRAINT `FK_c64e05f5b4ba491201748d4bf26` FOREIGN KEY (`CalculatorTypeID`) REFERENCES `calculator_types` (`ID`);
+-- calculator_countries
+CALL AddConstraintIfNotExists('calculator_countries', 'FK_6292ab3c1f4ff07bf3a3e5062e5', 'ALTER TABLE `calculator_countries` ADD CONSTRAINT `FK_6292ab3c1f4ff07bf3a3e5062e5` FOREIGN KEY (`CountryID`) REFERENCES `countries` (`ID`)');
+CALL AddConstraintIfNotExists('calculator_countries', 'FK_c64e05f5b4ba491201748d4bf26', 'ALTER TABLE `calculator_countries` ADD CONSTRAINT `FK_c64e05f5b4ba491201748d4bf26` FOREIGN KEY (`CalculatorTypeID`) REFERENCES `calculator_types` (`ID`)');
 
---
--- Constraints for table `calculator_provinces`
---
-ALTER TABLE `calculator_provinces`
-  ADD CONSTRAINT `FK_03a0eea008eb4ca1ab48a0ca796` FOREIGN KEY (`ProvinceID`) REFERENCES `provinces` (`ID`),
-  ADD CONSTRAINT `FK_1cab8e93ef3d00d2ee6bdc5e9c2` FOREIGN KEY (`CalculatorTypeID`) REFERENCES `calculator_types` (`ID`);
+-- calculator_provinces
+CALL AddConstraintIfNotExists('calculator_provinces', 'FK_03a0eea008eb4ca1ab48a0ca796', 'ALTER TABLE `calculator_provinces` ADD CONSTRAINT `FK_03a0eea008eb4ca1ab48a0ca796` FOREIGN KEY (`ProvinceID`) REFERENCES `provinces` (`ID`)');
+CALL AddConstraintIfNotExists('calculator_provinces', 'FK_1cab8e93ef3d00d2ee6bdc5e9c2', 'ALTER TABLE `calculator_provinces` ADD CONSTRAINT `FK_1cab8e93ef3d00d2ee6bdc5e9c2` FOREIGN KEY (`CalculatorTypeID`) REFERENCES `calculator_types` (`ID`)');
 
---
--- Constraints for table `clients`
---
-ALTER TABLE `clients`
-  ADD CONSTRAINT `FK_8e5f1736af0c63dede1ebb3d969` FOREIGN KEY (`SubscriptionId`) REFERENCES `subscriptions` (`ID`);
+-- clients
+CALL AddConstraintIfNotExists('clients', 'FK_8e5f1736af0c63dede1ebb3d969', 'ALTER TABLE `clients` ADD CONSTRAINT `FK_8e5f1736af0c63dede1ebb3d969` FOREIGN KEY (`SubscriptionId`) REFERENCES `subscriptions` (`ID`)');
 
---
--- Constraints for table `expertise_countries`
---
-ALTER TABLE `expertise_countries`
-  ADD CONSTRAINT `FK_a6271a8878edda40999d505fdb2` FOREIGN KEY (`CalculatorCountryID`) REFERENCES `calculator_countries` (`ID`),
-  ADD CONSTRAINT `FK_d7ab0f5de497fc435a3d0a91cdd` FOREIGN KEY (`ExpertID`) REFERENCES `experts` (`ID`);
+-- expertise_countries
+CALL AddConstraintIfNotExists('expertise_countries', 'FK_a6271a8878edda40999d505fdb2', 'ALTER TABLE `expertise_countries` ADD CONSTRAINT `FK_a6271a8878edda40999d505fdb2` FOREIGN KEY (`CalculatorCountryID`) REFERENCES `calculator_countries` (`ID`)');
+CALL AddConstraintIfNotExists('expertise_countries', 'FK_d7ab0f5de497fc435a3d0a91cdd', 'ALTER TABLE `expertise_countries` ADD CONSTRAINT `FK_d7ab0f5de497fc435a3d0a91cdd` FOREIGN KEY (`ExpertID`) REFERENCES `experts` (`ID`)');
 
---
--- Constraints for table `experts`
---
-ALTER TABLE `experts`
-  ADD CONSTRAINT `FK_694cddab18f832b25c098861aa0` FOREIGN KEY (`ExpertTypeID`) REFERENCES `expert_types` (`ID`),
-  ADD CONSTRAINT `FK_6ad235fcff122997f1e497139df` FOREIGN KEY (`ExpertStatusID`) REFERENCES `expert_statuses` (`ID`);
+-- experts
+CALL AddConstraintIfNotExists('experts', 'FK_694cddab18f832b25c098861aa0', 'ALTER TABLE `experts` ADD CONSTRAINT `FK_694cddab18f832b25c098861aa0` FOREIGN KEY (`ExpertTypeID`) REFERENCES `expert_types` (`ID`)');
+CALL AddConstraintIfNotExists('experts', 'FK_6ad235fcff122997f1e497139df', 'ALTER TABLE `experts` ADD CONSTRAINT `FK_6ad235fcff122997f1e497139df` FOREIGN KEY (`ExpertStatusID`) REFERENCES `expert_statuses` (`ID`)');
 
---
--- Constraints for table `payments`
---
-ALTER TABLE `payments`
-  ADD CONSTRAINT `FK_b1e3064068e1a05d37af0fec86a` FOREIGN KEY (`SubscriptionID`) REFERENCES `subscriptions` (`ID`),
-  ADD CONSTRAINT `FK_c9bf69bfc7ca9ea82aee7091708` FOREIGN KEY (`StatusId`) REFERENCES `payment_statuses` (`ID`);
+-- payments
+CALL AddConstraintIfNotExists('payments', 'FK_b1e3064068e1a05d37af0fec86a', 'ALTER TABLE `payments` ADD CONSTRAINT `FK_b1e3064068e1a05d37af0fec86a` FOREIGN KEY (`SubscriptionID`) REFERENCES `subscriptions` (`ID`)');
+CALL AddConstraintIfNotExists('payments', 'FK_c9bf69bfc7ca9ea82aee7091708', 'ALTER TABLE `payments` ADD CONSTRAINT `FK_c9bf69bfc7ca9ea82aee7091708` FOREIGN KEY (`StatusId`) REFERENCES `payment_statuses` (`ID`)');
 
---
--- Constraints for table `plan_prices`
---
-ALTER TABLE `plan_prices`
-  ADD CONSTRAINT `FK_09bd528f83f3908d5fad945e81f` FOREIGN KEY (`PlanID`) REFERENCES `plans` (`ID`),
-  ADD CONSTRAINT `FK_46cfee5eb5534e1e3256332f606` FOREIGN KEY (`RegionID`) REFERENCES `regions` (`ID`);
+-- plan_prices
+CALL AddConstraintIfNotExists('plan_prices', 'FK_09bd528f83f3908d5fad945e81f', 'ALTER TABLE `plan_prices` ADD CONSTRAINT `FK_09bd528f83f3908d5fad945e81f` FOREIGN KEY (`PlanID`) REFERENCES `plans` (`ID`)');
+CALL AddConstraintIfNotExists('plan_prices', 'FK_46cfee5eb5534e1e3256332f606', 'ALTER TABLE `plan_prices` ADD CONSTRAINT `FK_46cfee5eb5534e1e3256332f606` FOREIGN KEY (`RegionID`) REFERENCES `regions` (`ID`)');
 
---
--- Constraints for table `provinces`
---
-ALTER TABLE `provinces`
-  ADD CONSTRAINT `FK_8c1f4aad8475be025242b8b0e57` FOREIGN KEY (`CountryID`) REFERENCES `countries` (`ID`);
+-- provinces
+CALL AddConstraintIfNotExists('provinces', 'FK_8c1f4aad8475be025242b8b0e57', 'ALTER TABLE `provinces` ADD CONSTRAINT `FK_8c1f4aad8475be025242b8b0e57` FOREIGN KEY (`CountryID`) REFERENCES `countries` (`ID`)');
 
---
--- Constraints for table `subscriptions`
---
-ALTER TABLE `subscriptions`
-  ADD CONSTRAINT `FK_1422f649c9c8c83ef5a675e0aff` FOREIGN KEY (`PaymentFrequencyId`) REFERENCES `payment_frequencies` (`ID`),
-  ADD CONSTRAINT `FK_38a821d7b1cc006b3aea7fb8d10` FOREIGN KEY (`StatusId`) REFERENCES `subscription_statuses` (`ID`),
-  ADD CONSTRAINT `FK_c72d661e6de8eb5820b6c6ea9e0` FOREIGN KEY (`PlanId`) REFERENCES `plans` (`ID`);
+-- subscriptions
+CALL AddConstraintIfNotExists('subscriptions', 'FK_1422f649c9c8c83ef5a675e0aff', 'ALTER TABLE `subscriptions` ADD CONSTRAINT `FK_1422f649c9c8c83ef5a675e0aff` FOREIGN KEY (`PaymentFrequencyId`) REFERENCES `payment_frequencies` (`ID`)');
+CALL AddConstraintIfNotExists('subscriptions', 'FK_38a821d7b1cc006b3aea7fb8d10', 'ALTER TABLE `subscriptions` ADD CONSTRAINT `FK_38a821d7b1cc006b3aea7fb8d10` FOREIGN KEY (`StatusId`) REFERENCES `subscription_statuses` (`ID`)');
+CALL AddConstraintIfNotExists('subscriptions', 'FK_c72d661e6de8eb5820b6c6ea9e0', 'ALTER TABLE `subscriptions` ADD CONSTRAINT `FK_c72d661e6de8eb5820b6c6ea9e0` FOREIGN KEY (`PlanId`) REFERENCES `plans` (`ID`)');
 
---
--- Constraints for table `subscription_cost_history`
---
-ALTER TABLE `subscription_cost_history`
-  ADD CONSTRAINT `FK_3d117809e14d93b8664ce50c9d6` FOREIGN KEY (`SubscriptionID`) REFERENCES `subscriptions` (`ID`),
-  ADD CONSTRAINT `FK_ef5f6c8a3d3b5ed301d4db0a112` FOREIGN KEY (`PlanID`) REFERENCES `plans` (`ID`);
+-- subscription_cost_history
+CALL AddConstraintIfNotExists('subscription_cost_history', 'FK_3d117809e14d93b8664ce50c9d6', 'ALTER TABLE `subscription_cost_history` ADD CONSTRAINT `FK_3d117809e14d93b8664ce50c9d6` FOREIGN KEY (`SubscriptionID`) REFERENCES `subscriptions` (`ID`)');
+CALL AddConstraintIfNotExists('subscription_cost_history', 'FK_ef5f6c8a3d3b5ed301d4db0a112', 'ALTER TABLE `subscription_cost_history` ADD CONSTRAINT `FK_ef5f6c8a3d3b5ed301d4db0a112` FOREIGN KEY (`PlanID`) REFERENCES `plans` (`ID`)');
+
+-- =============================================
+-- Cleanup helper procedures
+-- =============================================
+DROP PROCEDURE IF EXISTS `AddIndexIfNotExists`;
+DROP PROCEDURE IF EXISTS `AddConstraintIfNotExists`;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -10,6 +10,7 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
+SET FOREIGN_KEY_CHECKS = 0;
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -778,6 +779,7 @@ CALL AddConstraintIfNotExists('subscription_cost_history', 'FK_ef5f6c8a3d3b5ed30
 -- =============================================
 DROP PROCEDURE IF EXISTS `AddIndexIfNotExists`;
 DROP PROCEDURE IF EXISTS `AddConstraintIfNotExists`;
+SET FOREIGN_KEY_CHECKS = 1;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

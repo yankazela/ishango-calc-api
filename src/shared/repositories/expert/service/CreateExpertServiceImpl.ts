@@ -23,7 +23,7 @@ export class CreateExpertServiceImpl implements CreateExpertService {
 		private expertStatusRepository: Repository<ExpertStatuses>,
 	) {}
 
-	async createExpert(request: CreateExpertRequest): Promise<void> {
+	async createExpert(request: CreateExpertRequest, profilePictureUrl: string): Promise<void> {
 		try {
 			const existingExpert = await this.expertRepository.findOneBy({ Email: request.email });
 			if (existingExpert) {
@@ -48,7 +48,7 @@ export class CreateExpertServiceImpl implements CreateExpertService {
 				Email: request.email,
 				Phone: request.phone,
 				Bio: request.bio,
-				ProfilePictureUrl: request.profilePictureUrl,
+				ProfilePictureUrl: profilePictureUrl,
 				Role: request.role,
 				Rating: request.rating,
 				ExpertTypeID: expertType.ID,

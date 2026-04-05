@@ -1,3 +1,5 @@
+import type { S3UploadFile } from '../../../s3/service/S3Service';
+
 export enum ExpertTypes {
 	COMPANY = 'COMPANY',
 	INDIVIDUAL = 'INDIVIDUAL',
@@ -8,7 +10,7 @@ export interface CreateExpertRequest {
 	email: string;
 	phone: string;
 	bio: string;
-	profilePictureUrl: string;
+	profilePicture: S3UploadFile;
 	role: string;
 	rating: number;
 	expertType: ExpertTypes;

@@ -369,6 +369,21 @@ INSERT INTO `expert_types` (`ID`, `Code`, `Name`, `CreatedAt`, `DisabledAt`) VAL
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `feature_flags`
+--
+
+CREATE TABLE IF NOT EXISTS `feature_flags` (
+  `id` varchar(50) NOT NULL,
+  `name` varchar(30) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `is_enabled` tinyint NOT NULL DEFAULT '0',
+  `created_at` varchar(255) NOT NULL,
+  `disabled_at` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `fx_rates`
 --
 
@@ -687,6 +702,9 @@ CALL AddIndexIfNotExists('expert_statuses', 'PRIMARY', 'ALTER TABLE `expert_stat
 
 -- expert_types
 CALL AddIndexIfNotExists('expert_types', 'PRIMARY', 'ALTER TABLE `expert_types` ADD PRIMARY KEY (`ID`)');
+
+-- feature_flags
+CALL AddIndexIfNotExists('feature_flags', 'PRIMARY', 'ALTER TABLE `feature_flags` ADD PRIMARY KEY (`id`)');
 
 -- fx_rates
 CALL AddIndexIfNotExists('fx_rates', 'PRIMARY', 'ALTER TABLE `fx_rates` ADD PRIMARY KEY (`ID`)');

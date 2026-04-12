@@ -22,4 +22,6 @@ export const RepositoriesSymbols: Record<string, symbol> = {
 	ExpertiseCountryRepository: Symbol.for('ExpertiseCountryRepository'),
 	GetExpertListService: Symbol.for('GetExpertListService'),
 	CreateExpertService: Symbol.for('CreateExpertService'),
+	FeatureFlagRepository: Symbol.for('FeatureFlagRepository'),
+	FeatureFlagRepositoryService: Symbol.for('FeatureFlagRepositoryService'),
 };

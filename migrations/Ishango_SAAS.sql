@@ -12,6 +12,9 @@ START TRANSACTION;
 SET time_zone = "+00:00";
 SET FOREIGN_KEY_CHECKS = 0;
 
+CREATE DATABASE IF NOT EXISTS `Ishango_SAAS` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+USE `Ishango_SAAS`;
+
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -21,8 +24,6 @@ SET FOREIGN_KEY_CHECKS = 0;
 --
 -- Database: `Ishango_SAAS`
 --
-CREATE DATABASE IF NOT EXISTS `Ishango_SAAS` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
-USE `Ishango_SAAS`;
 
 -- =============================================
 -- Helper procedures for idempotent index/constraint creation

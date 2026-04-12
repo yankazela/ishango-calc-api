@@ -12,10 +12,16 @@ npm install
 echo "3. Building project..."
 npm run build
 
-bash ../env.sh
+. ../env.sh 2>/dev/null || true
+
+set -a
+[ -f .env ] && . ./.env
+set +a
+
+DB_NAME="${DB_NAME:-Ishango_SAAS}"
 
 echo "4. Running migration..."
-mysql -u "$DB_USER" -p"$DB_PASSWORD" -h "$DB_HOST" "$DB_NAME" < migrations/Ishango_SAAS.sql
+mysql -u "$DB_USER" -p"$DB_PASSWORD" -h "$DB_HOST" --database="$DB_NAME" < migrations/Ishango_SAAS.sql
 
 echo "5. Restarting PM2 instance..."
 pm2 restart ishango-calc-api

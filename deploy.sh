@@ -18,7 +18,7 @@ set -a
 [ -f .env ] && . ./.env
 set +a
 
-DB_NAME="${DB_NAME:-Ishango_SAAS}"
+# DB_NAME="${DB_NAME:-Ishango_SAAS}"
 
 echo "4. Running migration..."
 mysql -u "$DB_USER" -p"$DB_PASSWORD" -h "$DB_HOST" --database="$DB_NAME" < migrations/Ishango_SAAS.sql

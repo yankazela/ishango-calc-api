@@ -14,6 +14,10 @@ npm run build
 
 bash ../env.sh
 
+set -a
+source .env
+set +a
+
 echo "4. Running migration..."
 mysql -u "$DB_USER" -p"$DB_PASSWORD" -h "$DB_HOST" "$DB_NAME" < migrations/Ishango_SAAS.sql
 

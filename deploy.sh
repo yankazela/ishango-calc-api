@@ -3,6 +3,9 @@ set -e
 
 echo "=== Deploying ishango-calc-api ==="
 
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/server_key
+
 echo "1. Pulling latest from main..."
 git pull origin main
 

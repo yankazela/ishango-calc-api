@@ -44,6 +44,9 @@ export class Subscriptions {
 	@Column()
 	CreatedAt: string;
 
+	@Column()
+	NextRenewalAt: string;
+
 	@Column({ nullable: true })
 	DisabledAt: string;
 }

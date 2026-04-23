@@ -10,6 +10,7 @@ export const RepositoriesSymbols: Record<string, symbol> = {
 	PlanRepository: Symbol.for('PlanRepository'),
 	PlanPriceRepository: Symbol.for('PlanPriceRepository'),
 	PlanRepositoryService: Symbol.for('PlanRepositoryService'),
+	ApiKeyRepository: Symbol.for('ApiKeyRepository'),
 	SubscriptionRepository: Symbol.for('SubscriptionRepository'),
 	SubscriptionRepositoryService: Symbol.for('SubscriptionRepositoryService'),
 	ClientRepository: Symbol.for('ClientRepository'),

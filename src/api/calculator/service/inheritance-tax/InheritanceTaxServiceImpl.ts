@@ -19,7 +19,7 @@ export class InheritanceTaxServiceImpl extends BaseCalculatorService implements 
 					return this.processUKInheritanceTax(data) as Promise<T>;
 				case 'us':
 					return this.processUSAInheritanceTax(data) as Promise<T>;
-				case 'ge':
+				case 'de':
 					return this.processGermanyInheritanceTax(data) as Promise<T>;
 				case 'es':
 					return this.processSpainInheritanceTax(data) as Promise<T>;

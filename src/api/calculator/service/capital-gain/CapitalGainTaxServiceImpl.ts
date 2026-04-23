@@ -23,7 +23,7 @@ export class CapitalGainTaxServiceImpl extends BaseCalculatorService implements 
 					return this.processUKCapitalGainTax(data) as Promise<T>;
 				case 'us':
 					return this.processUSACapitalGainTax(data) as Promise<T>;
-				case 'ge':
+				case 'de':
 					return this.processGermanyCapitalGainTax(data) as Promise<T>;
 				case 'br':
 					return this.processBrazilCapitalGainTax(data) as Promise<T>;

@@ -19,7 +19,7 @@ export class CorporateTaxServiceImpl extends BaseCalculatorService implements Co
 					return this.processAustraliaCorporateTax(data) as Promise<T>;
 				case 'uk':
 					return this.processUKCorporateTax(data) as Promise<T>;
-				case 'ge':
+				case 'de':
 					return this.processGermanyCorporateTax(data) as Promise<T>;
 				case 'br':
 					return this.processBrazilCorporateTax(data) as Promise<T>;

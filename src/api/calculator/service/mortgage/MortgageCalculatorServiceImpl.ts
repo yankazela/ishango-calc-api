@@ -19,7 +19,7 @@ export class MortgageCalculatorServiceImpl extends BaseCalculatorService impleme
 					return (await this.processAustraliaMortgage(data)) as T;
 				case 'uk':
 					return (await this.processUKMortgage(data)) as T;
-				case 'ge':
+				case 'de':
 					return (await this.processGermanyMortgage(data)) as T;
 				case 'br':
 					return (await this.processBrazilMortgage(data)) as T;

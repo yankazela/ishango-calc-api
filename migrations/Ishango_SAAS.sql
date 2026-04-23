@@ -61,6 +61,22 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `api_keys`
+--
+
+CREATE TABLE IF NOT EXISTS `api_keys` (
+  `ID` varchar(50) NOT NULL,
+  `SubscriptionID` varchar(50) NOT NULL,
+  `ApiKey` varchar(255) NOT NULL,
+  `Name` varchar(255) NOT NULL,
+  `IsActive` tinyint NOT NULL DEFAULT '1',
+  `CreatedAt` varchar(255) NOT NULL,
+  `DisabledAt` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `calculator_countries`
 --
 
@@ -231,7 +247,7 @@ INSERT INTO `countries` (`ID`, `Name`, `Code`, `FlagUrl`, `Currency`, `CurrencyS
 ('0328a50e-d83b-45a6-a963-d19983e83763', 'BRAZIL', 'BR', 'www.brazil.gov.br', 'BRL', 'R$', '', NULL),
 ('08891a23-c70c-4fc3-a7d4-47ec69d3ea13', 'INDIA', 'IN', 'www.india.gov.in', 'INR', '₹', '', NULL),
 ('103e8f49-f86a-4312-8cb9-511f872e5d84', 'UNITED_KINGDOM', 'UK', 'www.uk.co.uk', 'GBP', '£', '', NULL),
-('5a7422ce-aed0-4f33-b51b-465e852ed9e2', 'GERMANY', 'GE', 'www.germany.ge', 'EUR', '€', '', NULL),
+('5a7422ce-aed0-4f33-b51b-465e852ed9e2', 'GERMANY', 'de', 'www.germany.ge', 'EUR', '€', '', NULL),
 ('5ce41c58-4897-43b1-b494-09f1b2d27d73', 'CANADA', 'CA', 'http://www.example.com', 'CAD', '$', '', NULL),
 ('87dfdcf2-2f85-42c0-8eac-82957d98fd08', 'UNITED_STATES', 'US', 'www.usa.us', 'USD', '$', '', NULL),
 ('a4a3389e-785a-455a-aa7f-c9eb05a9a7e4', 'FRANCE', 'FR', 'www.example.com', 'EUR', '€', '', NULL),
@@ -667,6 +683,11 @@ INSERT INTO `subscription_statuses` (`ID`, `Description`, `Code`, `CreatedAt`, `
 -- Indexes for dumped tables (idempotent — skips if already exists)
 --
 
+-- api_keys
+CALL AddIndexIfNotExists('api_keys', 'PRIMARY', 'ALTER TABLE `api_keys` ADD PRIMARY KEY (`ID`)');
+CALL AddIndexIfNotExists('api_keys', 'UQ_api_keys_ApiKey', 'ALTER TABLE `api_keys` ADD UNIQUE KEY `UQ_api_keys_ApiKey` (`ApiKey`)');
+CALL AddIndexIfNotExists('api_keys', 'FK_api_keys_SubscriptionID', 'ALTER TABLE `api_keys` ADD KEY `FK_api_keys_SubscriptionID` (`SubscriptionID`)');
+
 -- calculator_countries
 CALL AddIndexIfNotExists('calculator_countries', 'PRIMARY', 'ALTER TABLE `calculator_countries` ADD PRIMARY KEY (`ID`)');
 CALL AddIndexIfNotExists('calculator_countries', 'FK_6292ab3c1f4ff07bf3a3e5062e5', 'ALTER TABLE `calculator_countries` ADD KEY `FK_6292ab3c1f4ff07bf3a3e5062e5` (`CountryID`)');
@@ -752,6 +773,9 @@ CALL AddIndexIfNotExists('subscription_statuses', 'PRIMARY', 'ALTER TABLE `subsc
 --
 -- Constraints for dumped tables (idempotent — skips if already exists)
 --
+
+-- api_keys
+CALL AddConstraintIfNotExists('api_keys', 'FK_api_keys_SubscriptionID', 'ALTER TABLE `api_keys` ADD CONSTRAINT `FK_api_keys_SubscriptionID` FOREIGN KEY (`SubscriptionID`) REFERENCES `subscriptions` (`ID`)');
 
 -- calculator_countries
 CALL AddConstraintIfNotExists('calculator_countries', 'FK_6292ab3c1f4ff07bf3a3e5062e5', 'ALTER TABLE `calculator_countries` ADD CONSTRAINT `FK_6292ab3c1f4ff07bf3a3e5062e5` FOREIGN KEY (`CountryID`) REFERENCES `countries` (`ID`)');

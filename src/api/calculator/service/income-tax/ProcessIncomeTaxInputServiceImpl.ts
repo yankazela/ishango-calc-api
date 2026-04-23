@@ -19,7 +19,7 @@ export class ProcessIncomeTaxInputServiceImpl extends BaseCalculatorService impl
 					return (await this.processAustraliaIncomeTax(data, isPrivate)) as T;
 				case 'uk':
 					return (await this.processUKIncomeTax(data, isPrivate)) as T;
-				case 'ge':
+				case 'de':
 					return (await this.processGermanyIncomeTax(data, isPrivate)) as T;
 				case 'br':
 					return (await this.processBrazilIncomeTax(data, isPrivate)) as T;

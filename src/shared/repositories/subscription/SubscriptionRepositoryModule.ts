@@ -4,12 +4,22 @@ import { DataSource } from 'typeorm';
 import { DatabaseModule } from '../../../shared/database/DatabaseModule';
 import { RepositoriesSymbols } from '../ioc';
 import { DatabaseSymbols } from '../../../shared/database/ioc';
-import { Clients, Subscriptions, SubscriptionStatuses, PaymentFrequencies } from '../entities';
+import { ApiKeys, Clients, PaymentFrequencies, Plans, Subscriptions, SubscriptionStatuses } from '../entities';
 import { SubscriptionRepositoryServiceImpl } from './service/SubscriptionRepositoryServiceImpl';
 
 @Module({
 	imports: [DatabaseModule],
 	providers: [
+		{
+			inject: [DatabaseSymbols.DatabaseSource],
+			provide: RepositoriesSymbols.PlanRepository,
+			useFactory: (dataSource: DataSource) => dataSource.getRepository(Plans),
+		},
+		{
+			inject: [DatabaseSymbols.DatabaseSource],
+			provide: RepositoriesSymbols.ApiKeyRepository,
+			useFactory: (dataSource: DataSource) => dataSource.getRepository(ApiKeys),
+		},
 		{
 			inject: [DatabaseSymbols.DatabaseSource],
 			provide: RepositoriesSymbols.SubscriptionRepository,

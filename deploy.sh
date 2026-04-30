@@ -29,6 +29,10 @@ npm run build
 # source migrations/Ishango_SAAS.sql;
 
 echo "5. Starting PM2 instance..."
-pm2 start --name ishango-calc-api
+if pm2 describe ishango-calc-api >/dev/null 2>&1; then
+	pm2 restart ishango-calc-api --update-env
+else
+	pm2 start dist/main.js --name ishango-calc-api
+fi
 
 echo "=== Deploy complete ==="

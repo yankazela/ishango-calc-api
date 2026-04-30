@@ -16,7 +16,7 @@ export class S3ServiceImpl implements S3Service {
 
 		this.bucket = this.configService.get<string>('AWS_S3_BUCKET');
 		this.s3Client = new S3Client({
-			region: this.configService.get<string>('AWS_REGION') ?? 'us-east-1',
+			region: this.configService.get<string>('AWS_REGION') ?? 'us-east-2',
 			endpoint: this.configService.get<string>('AWS_S3_ENDPOINT') || undefined,
 			forcePathStyle: this.configService.get<string>('AWS_S3_FORCE_PATH_STYLE') === 'true',
 			credentials: accessKeyId && secretAccessKey ? { accessKeyId, secretAccessKey } : undefined,
@@ -48,7 +48,8 @@ export class S3ServiceImpl implements S3Service {
 				contentType,
 				size: request.file.size,
 			};
-		} catch {
+		} catch (error) {
+			console.error('Error uploading file to S3:', error);
 			throw new InternalServerErrorException('Unable to upload file to S3.');
 		}
 	}

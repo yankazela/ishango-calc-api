@@ -16,7 +16,8 @@ export class BlogServiceImpl implements BlogService {
 		try {
 			const file = await this.s3Service.fetchFile(key);
 			return JSON.parse(file.body.toString('utf-8')) as BlogIndexResponse;
-		} catch {
+		} catch(error) {
+			console.error(`Error fetching blog index for language ${language}:`, error);
 			throw new NotFoundException(`Blog index not found for language: ${language}`);
 		}
 	}
@@ -27,7 +28,8 @@ export class BlogServiceImpl implements BlogService {
 		try {
 			const file = await this.s3Service.fetchFile(key);
 			return this.parseArticle(file.body.toString('utf-8'));
-		} catch {
+		} catch(error) {
+			console.error(`Error fetching article with slug ${slug}:`, error);
 			throw new NotFoundException(`Article not found: ${slug}`);
 		}
 	}

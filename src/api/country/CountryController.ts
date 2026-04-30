@@ -1,5 +1,6 @@
 import { Controller, Get, Inject, Param } from '@nestjs/common';
 import {
+	CountryArticle,
 	CountryWithCalculatorsItem,
 	GetCalCountriesResponse,
 } from '../../shared/repositories/country/domain/GetCalCountriesResponse';
@@ -24,5 +25,10 @@ export class CountryController {
 	@Get('/calculators')
 	listCountriesWithCalculators(): Promise<CountryWithCalculatorsItem[]> {
 		return this.countryService.listCountriesWithCalculators();
+	}
+
+	@Get('/articles/:fileName')
+	getCountryArticle(@Param('fileName') fileName: string): Promise<CountryArticle[]> {
+		return this.countryService.getCountryArticle(fileName);
 	}
 }

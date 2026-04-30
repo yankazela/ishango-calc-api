@@ -10,10 +10,15 @@ import * as Entities from '../repositories/entities';
 			provide: DatabaseSymbols.DatabaseSource,
 			inject: [ConfigService],
 			useFactory: async (configService: ConfigService) => {
+				const dbType =
+					(configService.get<string>('DB_TYPE') as 'mysql' | undefined) ??
+					'mysql';
+				const dbPort = Number(configService.get<string>('DB_PORT') ?? 3306);
+
 				const dataSource = new DataSource({
-					type: configService.get<string>('DB_TYPE') as 'mysql',
+					type: dbType,
 					host: configService.get<string>('DB_HOST'),
-					port: configService.get<number>('DB_PORT'),
+					port: Number.isNaN(dbPort) ? 3306 : dbPort,
 					username: configService.get<string>('DB_USERNAME'),
 					password: configService.get<string>('DB_PASSWORD'),
 					database: configService.get<string>('DB_NAME'),

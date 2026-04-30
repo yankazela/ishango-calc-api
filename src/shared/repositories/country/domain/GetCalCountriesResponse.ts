@@ -36,3 +36,21 @@ export interface TaxBracket {
 	to: number | null;
 	rate: number;
 }
+
+export type CountryCalculator = {
+  label: string;
+  href: string;
+};
+
+export type CountryArticle = {
+  code: string;
+  slug: string;
+  name: string;
+  summary: string;
+  description: string;
+  articleTitle: string;
+  articleIntro: string;
+  overview: string[];
+  highlights: string[];
+  calculators: CountryCalculator[];
+};

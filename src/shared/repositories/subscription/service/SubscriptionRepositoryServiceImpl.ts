@@ -6,6 +6,8 @@ import { ApiKeys, Clients, PaymentFrequencies, Plans, Subscriptions, Subscriptio
 import { IsNull, Repository } from 'typeorm';
 import { SubscriptionRepositoryService } from './SubscriptionRepositoryService';
 import { RepositoriesSymbols } from '../../ioc';
+import { ApiGatewaySymbols } from '../../../../shared/api-gateway/ioc';
+import type { ApiGatewayService } from '../../../../shared/api-gateway/service/ApiGatewayService';
 import { BadRequestException, Inject, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { SubscriptionApiKeyItem } from '../domain/SubscriptionApiKeyItem';
 import { SubscriptionDetailsResponse } from '../domain/SubscriptionDetailsResponse';
@@ -16,6 +18,8 @@ export class SubscriptionRepositoryServiceImpl implements SubscriptionRepository
 		return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
 	}
 	constructor(
+		@Inject(ApiGatewaySymbols.ApiGatewayService)
+		private readonly apiGatewayService: ApiGatewayService,
 		@Inject(RepositoriesSymbols.ApiKeyRepository)
 		private apiKeyRepository: Repository<ApiKeys>,
 		@Inject(RepositoriesSymbols.PlanRepository)
@@ -151,6 +155,18 @@ export class SubscriptionRepositoryServiceImpl implements SubscriptionRepository
 		return `isha_${randomBytes(24).toString('hex')}`;
 	}
 
+	private rethrowKnownError(error: unknown, fallbackMessage: string): never {
+		if (
+			error instanceof BadRequestException ||
+			error instanceof NotFoundException ||
+			error instanceof InternalServerErrorException
+		) {
+			throw error;
+		}
+
+		throw new InternalServerErrorException(fallbackMessage);
+	}
+
 	async createSubscription(request: CreateSubscriptionRequest): Promise<void> {
 		try {
 			const existingClient = await this.clientRepository.findOneBy({ Email: request.client.email });
@@ -229,18 +245,45 @@ export class SubscriptionRepositoryServiceImpl implements SubscriptionRepository
 			throw new BadRequestException('A subscription can only have up to 2 active API keys');
 		}
 
-		const apiKey = this.apiKeyRepository.create({
-			ID: randomUUID(),
-			SubscriptionID: subscriptionId,
-			ApiKey: this.generateApiKey(),
-			Name: request.name.trim(),
-			IsActive: true,
-			CreatedAt: this.formatDateTime(new Date()),
-		});
+		const generatedApiKey = this.generateApiKey();
+		let apiGatewayKeyId: string | undefined;
 
-		const savedApiKey = await this.apiKeyRepository.save(apiKey);
+		try {
+			const gatewayApiKey = await this.apiGatewayService.createApiKey({
+				name: request.name.trim(),
+				value: generatedApiKey,
+				enabled: true,
+				tags: {
+					subscriptionId,
+				},
+			});
 
-		return this.mapApiKey(savedApiKey);
+			apiGatewayKeyId = gatewayApiKey.id;
+
+			const apiKey = this.apiKeyRepository.create({
+				ID: randomUUID(),
+				SubscriptionID: subscriptionId,
+				ApiKey: gatewayApiKey.value ?? generatedApiKey,
+				ApiGatewayKeyId: gatewayApiKey.id,
+				Name: request.name.trim(),
+				IsActive: true,
+				CreatedAt: this.formatDateTime(new Date()),
+			});
+
+			const savedApiKey = await this.apiKeyRepository.save(apiKey);
+
+			return this.mapApiKey(savedApiKey);
+		} catch (error) {
+			if (apiGatewayKeyId) {
+				try {
+					await this.apiGatewayService.deleteApiKey(apiGatewayKeyId);
+				} catch (cleanupError) {
+					console.error('Error deleting API Gateway API key after database failure:', cleanupError);
+				}
+			}
+
+			this.rethrowKnownError(error, 'Unable to create API key');
+		}
 	}
 
 	async listApiKeys(subscriptionId: string): Promise<SubscriptionApiKeyItem[]> {
@@ -270,10 +313,18 @@ export class SubscriptionRepositoryServiceImpl implements SubscriptionRepository
 			throw new BadRequestException('API key is already deactivated');
 		}
 
-		apiKey.IsActive = false;
-		apiKey.DisabledAt = this.formatDateTime(new Date());
+		try {
+			if (apiKey.ApiGatewayKeyId) {
+				await this.apiGatewayService.deactivateApiKey(apiKey.ApiGatewayKeyId);
+			}
 
-		await this.apiKeyRepository.save(apiKey);
+			apiKey.IsActive = false;
+			apiKey.DisabledAt = this.formatDateTime(new Date());
+
+			await this.apiKeyRepository.save(apiKey);
+		} catch (error) {
+			this.rethrowKnownError(error, 'Unable to deactivate API key');
+		}
 	}
 
 	async getSubscriptionDetails(subscriptionId: string): Promise<SubscriptionDetailsResponse> {

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 
+import { ApiGatewayModule } from '../../../shared/api-gateway/ApiGatewayModule';
 import { DatabaseModule } from '../../../shared/database/DatabaseModule';
 import { RepositoriesSymbols } from '../ioc';
 import { DatabaseSymbols } from '../../../shared/database/ioc';
@@ -8,7 +9,7 @@ import { ApiKeys, Clients, PaymentFrequencies, Plans, Subscriptions, Subscriptio
 import { SubscriptionRepositoryServiceImpl } from './service/SubscriptionRepositoryServiceImpl';
 
 @Module({
-	imports: [DatabaseModule],
+	imports: [DatabaseModule, ApiGatewayModule],
 	providers: [
 		{
 			inject: [DatabaseSymbols.DatabaseSource],

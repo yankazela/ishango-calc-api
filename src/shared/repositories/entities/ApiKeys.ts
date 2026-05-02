@@ -16,6 +16,9 @@ export class ApiKeys {
 	@Column({ length: 255 })
 	ApiKey: string;
 
+	@Column({ length: 128, nullable: true })
+	ApiGatewayKeyId: string;
+
 	@Column({ length: 255 })
 	Name: string;
 

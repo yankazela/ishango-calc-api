@@ -9,6 +9,7 @@ import { SubscriptionModule } from './api/subscription/SubscriptionModule';
 import { FeatureFlagModule } from './api/feature-flag/FeatureFlagModule';
 import { BlogModule } from './api/blog/BlogModule';
 import { S3Module } from './shared/s3/S3Module';
+import { ApiGatewayModule } from './shared/api-gateway/ApiGatewayModule';
 
 @Module({
 	imports: [
@@ -21,6 +22,7 @@ import { S3Module } from './shared/s3/S3Module';
 		PingModule,
 		PlanModule,
 		SubscriptionModule,
+		ApiGatewayModule,
 		S3Module,
 	],
 	controllers: [],

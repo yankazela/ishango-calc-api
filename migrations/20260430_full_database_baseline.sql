@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS `api_keys` (
   `SubscriptionID` varchar(50) NOT NULL,
   `IsActive` tinyint NOT NULL,
   `ApiKey` varchar(255) NOT NULL,
+  `ApiGatewayKeyId` varchar(128) DEFAULT NULL,
   `Name` varchar(255) NOT NULL,
   `CreatedAt` varchar(255) NOT NULL,
   `DisabledAt` varchar(255) DEFAULT NULL,

@@ -33,6 +33,8 @@ export class CapitalGainTaxServiceImpl extends BaseCalculatorService implements 
 					return this.processIndiaCapitalGainTax(data) as Promise<T>;
 				case 'jp':
 					return this.processJapanCapitalGainTax(data) as Promise<T>;
+				case 'il':
+					return this.processIsraelCapitalGainTax(data) as Promise<T>;
 				default:
 					throw new Error(`Unsupported country: ${data.countryCode}`);
 			}
@@ -252,6 +254,25 @@ export class CapitalGainTaxServiceImpl extends BaseCalculatorService implements 
 		);
 
 		const taxOnGain = japanCapitalGainsService.calculate();
+
+		return taxOnGain;
+	}
+
+	private async processIsraelCapitalGainTax(data: CapitalGainTaxRequest): Promise<CapitalGain.Result> {
+		const countryRules = await this.getCountryRules<CapitalGain.IsraelCapitalGainsRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.CAPITAL_GAINS,
+		);
+
+		const israelCapitalGainsService = new CapitalGain.IsraelCapitalGainsService(
+			{
+				capitalGain: data.details.capitalGain,
+			},
+			countryRules,
+		);
+
+		const taxOnGain = israelCapitalGainsService.calculate();
 
 		return taxOnGain;
 	}

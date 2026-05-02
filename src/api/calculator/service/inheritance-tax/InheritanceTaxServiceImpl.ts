@@ -25,6 +25,8 @@ export class InheritanceTaxServiceImpl extends BaseCalculatorService implements 
 					return this.processSpainInheritanceTax(data) as Promise<T>;
 				case 'jp':
 					return this.processJapanInheritanceTax(data) as Promise<T>;
+				case 'nl':
+					return this.processNetherlandsInheritanceTax(data) as Promise<T>;
 				default:
 					throw new Error(`Unsupported country: ${data.countryCode}`);
 			}
@@ -180,6 +182,29 @@ export class InheritanceTaxServiceImpl extends BaseCalculatorService implements 
 		);
 
 		const result = japanInheritanceTaxService.calculate();
+
+		return result;
+	}
+
+	private async processNetherlandsInheritanceTax(
+		data: InheritanceTaxRequest,
+	): Promise<InheritanceTax.NetherlandsInheritanceTaxResult> {
+		const countryRules = await this.getCountryRules<InheritanceTax.NetherlandsInheritanceTaxRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.INHERITANCE_TAX,
+		);
+
+		const netherlandsInheritanceTaxService = new InheritanceTax.NetherlandsInheritanceTaxService(
+			{
+				estateValue: data.details.estateValue,
+				taxClass:
+					(data.details.taxClass as InheritanceTax.NetherlandsInheritanceTaxInput['taxClass']) || 'Other',
+			},
+			countryRules,
+		);
+
+		const result = netherlandsInheritanceTaxService.calculate();
 
 		return result;
 	}

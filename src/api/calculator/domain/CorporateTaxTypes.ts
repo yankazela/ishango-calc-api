@@ -23,7 +23,10 @@ export interface CorporateTaxResponse {
 		| CorporateTax.BrazilCorporateTaxResult
 		| CorporateTax.SpainCorporateTaxResult
 		| CorporateTax.IndiaCorporateTaxResult
-		| CorporateTax.JapanCorporateTaxResult;
+		| CorporateTax.JapanCorporateTaxResult
+		| CorporateTax.IsraelCorporateTaxResult
+		| CorporateTax.NetherlandsCorporateTaxResult
+		| CorporateTax.SwitzerlandCorporateTaxResult;
 	provincialTax?:
 		| CorporateTax.CanadaCorporateTaxResult
 		| CorporateTax.FranceCorporateTaxResult
@@ -34,5 +37,8 @@ export interface CorporateTaxResponse {
 		| CorporateTax.BrazilCorporateTaxResult
 		| CorporateTax.SpainCorporateTaxResult
 		| CorporateTax.IndiaCorporateTaxResult
-		| CorporateTax.JapanCorporateTaxResult;
+		| CorporateTax.JapanCorporateTaxResult
+		| CorporateTax.IsraelCorporateTaxResult
+		| CorporateTax.NetherlandsCorporateTaxResult
+		| CorporateTax.SwitzerlandCorporateTaxResult;
 }

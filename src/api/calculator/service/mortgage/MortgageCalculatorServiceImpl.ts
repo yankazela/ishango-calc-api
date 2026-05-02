@@ -29,6 +29,12 @@ export class MortgageCalculatorServiceImpl extends BaseCalculatorService impleme
 					return (await this.processIndiaMortgage(data)) as T;
 				case 'jp':
 					return (await this.processJapanMortgage(data)) as T;
+				case 'il':
+					return (await this.processIsraelMortgage(data)) as T;
+				case 'nl':
+					return (await this.processNetherlandsMortgage(data)) as T;
+				case 'ch':
+					return (await this.processSwitzerlandMortgage(data)) as T;
 				default:
 					throw new Error(`Unsupported country: ${data.countryCode}`);
 			}
@@ -281,5 +287,70 @@ export class MortgageCalculatorServiceImpl extends BaseCalculatorService impleme
 		const japanMortgageService = new Mortgage.JapanMortgageService();
 
 		return japanMortgageService.calculate(input, countryRules);
+	}
+
+	async processIsraelMortgage(data: MortgageRequest): Promise<Mortgage.IsraelMortgageOutput> {
+		const { propertyPrice, downPayment, interestRate, amortizationYears, isFirstTimeBuyer } = data.details;
+
+		const input: Mortgage.IsraelMortgageInput = {
+			propertyPrice,
+			downPayment,
+			annualInterestRate: interestRate,
+			amortizationYears,
+			isFirstTimeBuyer: isFirstTimeBuyer || false,
+		};
+
+		const countryRules = await this.getCountryRules<Mortgage.IsraelMortgageRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.MORTGAGE,
+		);
+
+		const israelMortgageService = new Mortgage.IsraelMortgageService();
+
+		return israelMortgageService.calculate(input, countryRules);
+	}
+
+	async processNetherlandsMortgage(data: MortgageRequest): Promise<Mortgage.NetherlandsMortgageOutput> {
+		const { propertyPrice, downPayment, interestRate, amortizationYears, isPrimaryResidence } = data.details;
+
+		const input: Mortgage.NetherlandsMortgageInput = {
+			propertyPrice,
+			downPayment,
+			annualInterestRate: interestRate,
+			amortizationYears,
+			isPrimaryResidence: isPrimaryResidence || false,
+		};
+
+		const countryRules = await this.getCountryRules<Mortgage.NetherlandsMortgageRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.MORTGAGE,
+		);
+
+		const netherlandsMortgageService = new Mortgage.NetherlandsMortgageService();
+
+		return netherlandsMortgageService.calculate(input, countryRules);
+	}
+
+	async processSwitzerlandMortgage(data: MortgageRequest): Promise<Mortgage.SwitzerlandMortgageOutput> {
+		const { propertyPrice, downPayment, interestRate, amortizationYears } = data.details;
+
+		const input: Mortgage.SwitzerlandMortgageInput = {
+			propertyPrice,
+			downPayment,
+			annualInterestRate: interestRate,
+			amortizationYears,
+		};
+
+		const countryRules = await this.getCountryRules<Mortgage.SwitzerlandMortgageRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.MORTGAGE,
+		);
+
+		const switzerlandMortgageService = new Mortgage.SwitzerlandMortgageService();
+
+		return switzerlandMortgageService.calculate(input, countryRules);
 	}
 }

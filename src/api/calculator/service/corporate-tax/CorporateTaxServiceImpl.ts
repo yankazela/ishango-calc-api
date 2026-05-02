@@ -29,6 +29,12 @@ export class CorporateTaxServiceImpl extends BaseCalculatorService implements Co
 					return this.processIndiaCorporateTax(data) as Promise<T>;
 				case 'jp':
 					return this.processJapanCorporateTax(data) as Promise<T>;
+				case 'il':
+					return this.processIsraelCorporateTax(data) as Promise<T>;
+				case 'nl':
+					return this.processNetherlandsCorporateTax(data) as Promise<T>;
+				case 'ch':
+					return this.processSwitzerlandCorporateTax(data) as Promise<T>;
 				default:
 					throw new Error(`Unsupported country: ${data.countryCode}`);
 			}
@@ -231,6 +237,60 @@ export class CorporateTaxServiceImpl extends BaseCalculatorService implements Co
 
 		return {
 			federalTax: japanService.calculate(),
+		};
+	}
+
+	private async processIsraelCorporateTax(data: CorporateTaxRequest): Promise<CorporateTaxResponse> {
+		const countryRules = await this.getCountryRules<CorporateTax.IsraelCorporateTaxRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.CORPORATE_TAX,
+		);
+
+		const israelInput: CorporateTax.IsraelCorporateTaxInput = {
+			taxableIncome: data.details.taxableIncome,
+		};
+
+		const israelService = new CorporateTax.IsraelCorporateTaxService(israelInput, countryRules);
+
+		return {
+			federalTax: israelService.calculate(),
+		};
+	}
+
+	private async processNetherlandsCorporateTax(data: CorporateTaxRequest): Promise<CorporateTaxResponse> {
+		const countryRules = await this.getCountryRules<CorporateTax.NetherlandsCorporateTaxRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.CORPORATE_TAX,
+		);
+
+		const netherlandsInput: CorporateTax.NetherlandsCorporateTaxInput = {
+			taxableIncome: data.details.taxableIncome,
+		};
+
+		const netherlandsService = new CorporateTax.NetherlandsCorporateTaxService(netherlandsInput, countryRules);
+
+		return {
+			federalTax: netherlandsService.calculate(),
+		};
+	}
+
+	private async processSwitzerlandCorporateTax(data: CorporateTaxRequest): Promise<CorporateTaxResponse> {
+		const countryRules = await this.getCountryRules<CorporateTax.SwitzerlandCorporateTaxRules>(
+			data.countryCode,
+			data.year,
+			CalculatorType.CORPORATE_TAX,
+		);
+
+		const switzerlandInput: CorporateTax.SwitzerlandCorporateTaxInput = {
+			taxableIncome: data.details.taxableIncome,
+		};
+
+		const switzerlandService = new CorporateTax.SwitzerlandCorporateTaxService(switzerlandInput, countryRules);
+
+		return {
+			federalTax: switzerlandService.calculate(),
 		};
 	}
 }

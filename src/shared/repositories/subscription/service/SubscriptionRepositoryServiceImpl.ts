@@ -7,7 +7,7 @@ import { IsNull, Repository } from 'typeorm';
 import { SubscriptionRepositoryService } from './SubscriptionRepositoryService';
 import { RepositoriesSymbols } from '../../ioc';
 import { ApiGatewaySymbols } from '../../../../shared/api-gateway/ioc';
-import type { ApiGatewayService } from '../../../../shared/api-gateway/service/ApiGatewayService';
+import type { ApiGatewayService, ApiKeyUsage } from '../../../../shared/api-gateway/service/ApiGatewayService';
 import { BadRequestException, Inject, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { SubscriptionApiKeyItem } from '../domain/SubscriptionApiKeyItem';
 import { SubscriptionDetailsResponse } from '../domain/SubscriptionDetailsResponse';
@@ -47,7 +47,7 @@ export class SubscriptionRepositoryServiceImpl implements SubscriptionRepository
 		}
 	}
 
-	private mapApiKey(apiKey: ApiKeys): SubscriptionApiKeyItem {
+	private mapApiKey(apiKey: ApiKeys, usage?: ApiKeyUsage): SubscriptionApiKeyItem {
 		return {
 			id: apiKey.ID,
 			name: apiKey.Name,
@@ -55,6 +55,8 @@ export class SubscriptionRepositoryServiceImpl implements SubscriptionRepository
 			isActive: apiKey.IsActive,
 			createdAt: apiKey.CreatedAt,
 			disabledAt: apiKey.DisabledAt ?? null,
+			usedThisMonth: usage?.used ?? 0,
+			remainingThisMonth: usage?.remaining ?? 0,
 		};
 	}
 
@@ -66,6 +68,16 @@ export class SubscriptionRepositoryServiceImpl implements SubscriptionRepository
 		}
 
 		return subscription;
+	}
+
+	private async fetchUsageMap(plan: Plans | null): Promise<Record<string, ApiKeyUsage>> {
+		if (!plan?.AwsUsagePlanId) {
+			return {};
+		}
+		const now = new Date();
+		const startDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+		const endDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+		return this.apiGatewayService.getApiKeysUsage(plan.AwsUsagePlanId, startDate, endDate);
 	}
 
 	private async buildSubscriptionDetails(
@@ -147,8 +159,15 @@ export class SubscriptionRepositoryServiceImpl implements SubscriptionRepository
 				description: status.Description,
 				code: status.Code,
 			},
-			apiKeys: apiKeys.map((apiKey) => this.mapApiKey(apiKey)),
+			apiKeys: await this.mapApiKeysWithUsage(apiKeys, plan),
 		};
+	}
+
+	private async mapApiKeysWithUsage(apiKeys: ApiKeys[], plan: Plans | null): Promise<SubscriptionApiKeyItem[]> {
+		const usageMap = await this.fetchUsageMap(plan);
+		return apiKeys.map((apiKey) =>
+			this.mapApiKey(apiKey, apiKey.ApiGatewayKeyId ? usageMap[apiKey.ApiGatewayKeyId] : undefined),
+		);
 	}
 
 	private generateApiKey(): string {
@@ -192,6 +211,7 @@ export class SubscriptionRepositoryServiceImpl implements SubscriptionRepository
 				PaymentFrequencyId: paymentFrequency.ID,
 				StatusId: status.ID,
 				StartDate: this.formatDateTime(new Date()),
+				NextRenewalAt: request.subscription.nextRenewalAt,
 				CurrentCost: request.subscription.currentCost,
 				CurrencyRegionCode: request.subscription.currencyRegionCode,
 				SelectedCalculators: request.subscription.selectedCalculators,
@@ -227,7 +247,7 @@ export class SubscriptionRepositoryServiceImpl implements SubscriptionRepository
 	}
 
 	async createApiKey(subscriptionId: string, request: CreateApiKeyRequest): Promise<SubscriptionApiKeyItem> {
-		await this.getSubscriptionOrFail(subscriptionId);
+		const subscription = await this.getSubscriptionOrFail(subscriptionId);
 
 		if (!request.name?.trim()) {
 			throw new BadRequestException('API key name is required');
@@ -248,11 +268,14 @@ export class SubscriptionRepositoryServiceImpl implements SubscriptionRepository
 		const generatedApiKey = this.generateApiKey();
 		let apiGatewayKeyId: string | undefined;
 
+		const plan = await this.planRepository.findOneBy({ ID: subscription.PlanId });
+
 		try {
 			const gatewayApiKey = await this.apiGatewayService.createApiKey({
 				name: request.name.trim(),
 				value: generatedApiKey,
 				enabled: true,
+				usagePlanId: plan?.AwsUsagePlanId || undefined,
 				tags: {
 					subscriptionId,
 				},
@@ -287,14 +310,17 @@ export class SubscriptionRepositoryServiceImpl implements SubscriptionRepository
 	}
 
 	async listApiKeys(subscriptionId: string): Promise<SubscriptionApiKeyItem[]> {
-		await this.getSubscriptionOrFail(subscriptionId);
+		const subscription = await this.getSubscriptionOrFail(subscriptionId);
 
-		const apiKeys = await this.apiKeyRepository.find({
-			where: { SubscriptionID: subscriptionId },
-			order: { CreatedAt: 'DESC' },
-		});
+		const [apiKeys, plan] = await Promise.all([
+			this.apiKeyRepository.find({
+				where: { SubscriptionID: subscriptionId },
+				order: { CreatedAt: 'DESC' },
+			}),
+			this.planRepository.findOneBy({ ID: subscription.PlanId }),
+		]);
 
-		return apiKeys.map((apiKey) => this.mapApiKey(apiKey));
+		return this.mapApiKeysWithUsage(apiKeys, plan);
 	}
 
 	async deactivateApiKey(subscriptionId: string, apiKeyId: string): Promise<void> {
@@ -347,7 +373,7 @@ export class SubscriptionRepositoryServiceImpl implements SubscriptionRepository
 		}
 
 		const subscription = await this.getSubscriptionOrFail(client.SubscriptionId);
-
+		
 		return this.buildSubscriptionDetails(subscription, client);
 	}
 }

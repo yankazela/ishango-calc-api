@@ -1,0 +1,20 @@
+import { BadRequestException } from "@nestjs/common";
+import { ValidationService } from "./ValidationService";
+import { validate } from "class-validator";
+
+export class ValidationServiceImpl  implements ValidationService {
+    public async validate(): Promise<void> {
+        const validationErrors = await validate(this);
+
+        if (validationErrors.length > 0) {
+            const messagesList = validationErrors.map(
+                (val: any) => val?.constraints ? Object.values(val.constraints).join(', ') : val.toString()
+            );
+
+            throw new BadRequestException({
+                message: messagesList.join(', '),
+                status: 400,
+            });
+        }
+    }
+}

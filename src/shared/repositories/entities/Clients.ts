@@ -15,7 +15,7 @@ export class Clients {
 	@Column({ length: 100 })
 	Email: string;
 
-	@Column({ length: 12 })
+	@Column({ length: 20 })
 	Phone: string;
 
 	@Column({ length: 5 })

@@ -13,21 +13,21 @@ export class ApiKeys {
 	@JoinColumn({ name: 'SubscriptionID', referencedColumnName: 'ID' })
 	Subscription: Subscriptions;
 
-	@Column({ length: 255 })
+	@Column({ length: 100 })
 	ApiKey: string;
 
-	@Column({ length: 128, nullable: true })
+	@Column({ length: 128 })
 	ApiGatewayKeyId: string;
 
-	@Column({ length: 255 })
+	@Column({ length: 100 })
 	Name: string;
 
 	@Column()
 	IsActive: boolean;
 
-	@Column()
+	@Column({ length: 30 })
 	CreatedAt: string;
 
-	@Column({ nullable: true })
+	@Column({ length: 30, nullable: true })
 	DisabledAt: string;
 }

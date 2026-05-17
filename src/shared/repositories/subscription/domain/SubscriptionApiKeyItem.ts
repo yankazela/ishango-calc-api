@@ -5,4 +5,6 @@ export interface SubscriptionApiKeyItem {
 	isActive: boolean;
 	createdAt: string;
 	disabledAt: string | null;
+	usedThisMonth: number | null;
+	remainingThisMonth: number | null;
 }

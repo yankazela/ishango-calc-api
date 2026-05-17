@@ -3,6 +3,7 @@ export interface Subscription {
 	paymentFrequencyCode: string;
 	currencyRegionCode: string;
 	currentCost: number;
+	nextRenewalAt: string;
 	selectedCalculators: string;
 }
 

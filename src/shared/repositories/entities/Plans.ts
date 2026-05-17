@@ -34,4 +34,7 @@ export class Plans {
 
 	@Column({ nullable: true })
 	DisabledAt: string;
+
+	@Column({ nullable: true, length: 128 })
+	AwsUsagePlanId: string;
 }

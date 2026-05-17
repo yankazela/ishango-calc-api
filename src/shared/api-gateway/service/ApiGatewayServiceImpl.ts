@@ -4,6 +4,7 @@ import {
 	CreateUsagePlanKeyCommand,
 	DeleteApiKeyCommand,
 	GetApiKeyCommand,
+	GetUsageCommand,
 	GetUsagePlansCommand,
 	UpdateApiKeyCommand,
 } from '@aws-sdk/client-api-gateway';
@@ -17,6 +18,7 @@ import { ConfigService } from '@nestjs/config';
 import type {
 	ApiGatewayApiKeyResponse,
 	ApiGatewayService,
+	ApiKeyUsage,
 	CreateApiGatewayApiKeyRequest,
 } from './ApiGatewayService';
 
@@ -42,8 +44,10 @@ export class ApiGatewayServiceImpl implements ApiGatewayService {
 			throw new BadRequestException('API Gateway API key name is required.');
 		}
 
-		if (!this.usagePlanId) {
-			throw new InternalServerErrorException('AWS_API_GATEWAY_USAGE_PLAN_ID is not configured.');
+		const resolvedUsagePlanId = request.usagePlanId?.trim() || this.usagePlanId;
+
+		if (!resolvedUsagePlanId) {
+			throw new InternalServerErrorException('No usage plan ID is configured for this API key.');
 		}
 
 		let createdApiKeyId: string | undefined;
@@ -73,7 +77,7 @@ export class ApiGatewayServiceImpl implements ApiGatewayService {
 
 			await this.apiGatewayClient.send(
 				new CreateUsagePlanKeyCommand({
-					usagePlanId: this.usagePlanId,
+					usagePlanId: resolvedUsagePlanId,
 					keyId: response.id,
 					keyType: 'API_KEY',
 				}),
@@ -157,6 +161,37 @@ export class ApiGatewayServiceImpl implements ApiGatewayService {
 				error,
 				enabled ? 'Unable to activate API Gateway API key.' : 'Unable to deactivate API Gateway API key.',
 			);
+		}
+	}
+
+	async getApiKeysUsage(usagePlanId: string, startDate: string, endDate: string): Promise<Record<string, ApiKeyUsage>> {
+		try {
+			const response = await this.apiGatewayClient.send(
+				new GetUsageCommand({ usagePlanId, startDate, endDate }),
+			);
+
+			console.log('API Gateway usage response:', JSON.stringify(response), usagePlanId, startDate, endDate);
+			const result: Record<string, ApiKeyUsage> = {};
+
+			for (const [keyId, dailyEntries] of Object.entries(response.items ?? {})) {
+				let used = 0;
+				let remaining: number | null = null;
+
+				for (const entry of dailyEntries) {
+					if (Array.isArray(entry) && entry.length >= 1) {
+						used += entry[0] ?? 0;
+						if (entry[1] != null) {
+							remaining = entry[1];
+						}
+					}
+				}
+
+				result[keyId] = { used, remaining };
+			}
+
+			return result;
+		} catch {
+			return {};
 		}
 	}
 

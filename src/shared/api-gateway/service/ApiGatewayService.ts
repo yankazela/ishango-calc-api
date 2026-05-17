@@ -5,6 +5,7 @@ export type CreateApiGatewayApiKeyRequest = {
 	value?: string;
 	customerId?: string;
 	generateDistinctId?: boolean;
+	usagePlanId?: string;
 	stageKeys?: Array<{
 		restApiId: string;
 		stageName: string;
@@ -20,9 +21,15 @@ export type ApiGatewayApiKeyResponse = {
 	description?: string;
 };
 
+export type ApiKeyUsage = {
+	used: number;
+	remaining: number | null;
+};
+
 export interface ApiGatewayService {
 	createApiKey(request: CreateApiGatewayApiKeyRequest): Promise<ApiGatewayApiKeyResponse>;
 	activateApiKey(apiKeyId: string): Promise<void>;
 	deactivateApiKey(apiKeyId: string): Promise<void>;
 	deleteApiKey(apiKeyId: string): Promise<void>;
+	getApiKeysUsage(usagePlanId: string, startDate: string, endDate: string): Promise<Record<string, ApiKeyUsage>>;
 }

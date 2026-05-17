@@ -1,15 +1,35 @@
 import { CorporateTax } from '@novha/calc-engines';
+import { IsDefined, IsOptional, IsString } from 'class-validator';
+import { ValidationServiceImpl } from 'src/shared/validations/ValidationServiceImpl';
 
-export interface CorporateTaxRequest {
+export class CorporateTaxRequest extends ValidationServiceImpl {
+	@IsDefined()
 	details: {
 		taxableIncome: number;
 		isSmallBusiness: boolean;
 		annualTurnover?: number;
 		grossIncome?: number;
 	};
+
+	@IsDefined()
+	@IsString()
 	countryCode: string;
+
+	@IsDefined()
+	@IsString()
 	year: string;
-	provinceCode?: string; // Optional for countries that don't have provinces
+
+	@IsOptional()
+	@IsString()
+	provinceCode?: string;
+
+	public constructor(props: CorporateTaxRequest) {
+		super();
+		this.details = props?.details;
+		this.countryCode = props?.countryCode;
+		this.year = props?.year;
+		this.provinceCode = props?.provinceCode;
+	}
 }
 
 export interface CorporateTaxResponse {

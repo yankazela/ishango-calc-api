@@ -1,17 +1,17 @@
-import { Controller, Get, Inject, Post, Body } from '@nestjs/common';
+import { Controller, Get, Inject, Post, Body, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import { CalculatorTypeItem } from '../../shared/repositories/calculator/domain/CalculatorTypeResponse';
 import { CalculatorSymbols } from './ioc';
 import type { ListCalculatorService } from './service/list/ListCalculatorsService';
 import type { ProcessIncomeTaxInputService } from './service/income-tax/ProcessIncomeTaxInputService';
-import type { IncomeTaxRequest } from './domain/IncomeTaxTypes';
-import type { MortgageRequest } from './domain/MortgageTypes';
+import { IncomeTaxRequest } from './domain/IncomeTaxTypes';
+import { MortgageRequest } from './domain/MortgageTypes';
 import type { MortgageCalculatorService } from './service/mortgage/MortgageCalculatorService';
 import type { CorporateTaxService } from './service/corporate-tax/CorporateTaxService';
-import type { CorporateTaxRequest } from './domain/CorporateTaxTypes';
+import { CorporateTaxRequest } from './domain/CorporateTaxTypes';
 import type { CapitalGainTaxService } from './service/capital-gain/CapitalGainTaxService';
-import type { CapitalGainTaxRequest } from './domain/CapitalGainTaxTypes';
+import { CapitalGainTaxRequest } from './domain/CapitalGainTaxTypes';
 import type { InheritanceTaxService } from './service/inheritance-tax/InheritanceTaxService';
-import type { InheritanceTaxRequest } from './domain/InheritanceTaxTypes';
+import { InheritanceTaxRequest } from './domain/InheritanceTaxTypes';
 
 @Controller('calculators')
 export class CalculatorController {
@@ -36,32 +36,44 @@ export class CalculatorController {
 	}
 
 	@Post('/process-income-tax')
-	processIncomeTax(@Body() request: IncomeTaxRequest): Promise<unknown> {
+	async processIncomeTax(@Body() body: IncomeTaxRequest): Promise<unknown> {
+		const request = new IncomeTaxRequest(body);
+		await request.validate();
 		return this.processIncomeTaxInputService.processIncomeTax<unknown>(request);
 	}
 
 	@Post('/process-income-tax/private')
-	processIncomeTaxPrivate(@Body() request: IncomeTaxRequest): Promise<unknown> {
-		return this.processIncomeTaxInputService.processIncomeTax<unknown>(request, true);
+	async processIncomeTaxPrivate(@Body() body: IncomeTaxRequest): Promise<unknown> {
+		const request = new IncomeTaxRequest(body);
+		await request.validate();
+		return this.processIncomeTaxInputService.processIncomeTax<unknown>(request);
 	}
 
 	@Post('/process-mortgage')
-	processMortgage(@Body() request: MortgageRequest): Promise<unknown> {
+	async processMortgage(@Body() body: MortgageRequest): Promise<unknown> {
+		const request = new MortgageRequest(body);
+		await request.validate();
 		return this.mortgageCalculatorService.processMortgage<unknown>(request);
 	}
 
 	@Post('/process-corporate-tax')
-	processCorporateTax(@Body() request: CorporateTaxRequest): Promise<unknown> {
+	async processCorporateTax(@Body() body: CorporateTaxRequest): Promise<unknown> {
+		const request = new CorporateTaxRequest(body);
+		await request.validate();
 		return this.corporateTaxService.processCorporateTax<unknown>(request);
 	}
 
 	@Post('/process-capital-gains-tax')
-	processCapitalGainTax(@Body() request: CapitalGainTaxRequest): Promise<unknown> {
+	async processCapitalGainTax(@Body() body: CapitalGainTaxRequest): Promise<unknown> {
+		const request = new CapitalGainTaxRequest(body);
+		await request.validate();
 		return this.capitalGainTaxService.processCapitalGainTax<unknown>(request);
 	}
 
 	@Post('/process-inheritance-tax')
-	processInheritanceTax(@Body() request: InheritanceTaxRequest): Promise<unknown> {
+	async processInheritanceTax(@Body() body: InheritanceTaxRequest): Promise<unknown> {
+		const request = new InheritanceTaxRequest(body);
+		await request.validate();
 		return this.inheritanceTaxService.processInheritanceTax<unknown>(request);
 	}
 }

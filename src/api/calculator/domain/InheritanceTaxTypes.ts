@@ -1,4 +1,8 @@
-export interface InheritanceTaxRequest {
+import { IsDefined, IsString } from 'class-validator';
+import { ValidationServiceImpl } from 'src/shared/validations/ValidationServiceImpl';
+
+export class InheritanceTaxRequest extends ValidationServiceImpl {
+	@IsDefined()
 	details: {
 		estateValue: number;
 		adjustedCostBase?: number;
@@ -8,6 +12,19 @@ export interface InheritanceTaxRequest {
 		taxClass?: string;
 		numberOfStatutoryHeirs?: number;
 	};
+
+	@IsDefined()
+	@IsString()
 	countryCode: string;
+
+	@IsDefined()
+	@IsString()
 	year: string;
+
+	public constructor(props: InheritanceTaxRequest) {
+		super();
+		this.details = props?.details;
+		this.countryCode = props?.countryCode;
+		this.year = props?.year;
+	}
 }

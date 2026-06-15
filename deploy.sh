@@ -36,6 +36,7 @@ if pm2 describe ishango-calc-api >/dev/null 2>&1; then
 	pm2 restart ishango-calc-api --update-env
 else
 	pm2 start dist/main.js --name ishango-calc-api
+	pm2 log ishango-calc-api
 fi
 
 echo "=== Deploy complete ==="

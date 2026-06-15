@@ -16,11 +16,12 @@ export class AddExpertServiceImpl implements AddExpertService {
 	) {}
 
 	async addExpert(request: CreateExpertRequest): Promise<void> {
+		
 		const uploadResult = await this.s3Service.uploadFile({
 			file: request.profilePicture,
 			folder: 'experts/profile-pictures',
 		});
-
-		return this.createExpertService.createExpert(request, uploadResult.key);
+		
+		this.createExpertService.createExpert(request, uploadResult.key);
 	}
 }

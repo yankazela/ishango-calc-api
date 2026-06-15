@@ -53,7 +53,7 @@ export class CalcCountryRepositoryServiceImpl implements CalcCountryRepositorySe
 						id: p.ID,
 						name: p.Name,
 						code: p.Code,
-					}));
+					})).sort((a, b) => a.name.localeCompare(b.name));
 				}
 
 				return { ...data, provinces, taxBrackets };

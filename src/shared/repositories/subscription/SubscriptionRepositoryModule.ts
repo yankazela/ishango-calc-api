@@ -3,13 +3,14 @@ import { DataSource } from 'typeorm';
 
 import { ApiGatewayModule } from '../../../shared/api-gateway/ApiGatewayModule';
 import { DatabaseModule } from '../../../shared/database/DatabaseModule';
+import { SESModule } from '../../../shared/ses/SESModule';
 import { RepositoriesSymbols } from '../ioc';
 import { DatabaseSymbols } from '../../../shared/database/ioc';
 import { ApiKeys, Clients, PaymentFrequencies, Plans, Subscriptions, SubscriptionStatuses } from '../entities';
 import { SubscriptionRepositoryServiceImpl } from './service/SubscriptionRepositoryServiceImpl';
 
 @Module({
-	imports: [DatabaseModule, ApiGatewayModule],
+	imports: [DatabaseModule, ApiGatewayModule, SESModule],
 	providers: [
 		{
 			inject: [DatabaseSymbols.DatabaseSource],

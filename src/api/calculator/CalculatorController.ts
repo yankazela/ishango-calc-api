@@ -1,4 +1,4 @@
-import { Controller, Get, Inject, Post, Body, InternalServerErrorException, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Inject, Post, Body, InternalServerErrorException, BadRequestException, UseGuards } from '@nestjs/common';
 import { CalculatorTypeItem } from '../../shared/repositories/calculator/domain/CalculatorTypeResponse';
 import { CalculatorSymbols } from './ioc';
 import type { ListCalculatorService } from './service/list/ListCalculatorsService';
@@ -12,7 +12,9 @@ import type { CapitalGainTaxService } from './service/capital-gain/CapitalGainTa
 import { CapitalGainTaxRequest } from './domain/CapitalGainTaxTypes';
 import type { InheritanceTaxService } from './service/inheritance-tax/InheritanceTaxService';
 import { InheritanceTaxRequest } from './domain/InheritanceTaxTypes';
+import { ApiKeyGuard } from '../../shared/guards/ApiKeyGuard';
 
+@UseGuards(ApiKeyGuard)
 @Controller('calculators')
 export class CalculatorController {
 	constructor(
@@ -46,7 +48,7 @@ export class CalculatorController {
 	async processIncomeTaxPrivate(@Body() body: IncomeTaxRequest): Promise<unknown> {
 		const request = new IncomeTaxRequest(body);
 		await request.validate();
-		return this.processIncomeTaxInputService.processIncomeTax<unknown>(request);
+		return this.processIncomeTaxInputService.processIncomeTax<unknown>(request, true);
 	}
 
 	@Post('/process-mortgage')

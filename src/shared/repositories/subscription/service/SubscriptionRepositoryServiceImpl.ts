@@ -11,6 +11,8 @@ import type { ApiGatewayService, ApiKeyUsage } from '../../../../shared/api-gate
 import { BadRequestException, Inject, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { SubscriptionApiKeyItem } from '../domain/SubscriptionApiKeyItem';
 import { SubscriptionDetailsResponse } from '../domain/SubscriptionDetailsResponse';
+import { SESSymbols } from '../../../../shared/ses/ioc';
+import type { SESService } from '../../../../shared/ses/service/SESService';
 
 export class SubscriptionRepositoryServiceImpl implements SubscriptionRepositoryService {
 	private formatDateTime(date: Date): string {
@@ -32,6 +34,8 @@ export class SubscriptionRepositoryServiceImpl implements SubscriptionRepository
 		private subscriptionStatusRepository: Repository<SubscriptionStatuses>,
 		@Inject(RepositoriesSymbols.PaymentFrequencyRepository)
 		private paymentFrequencyRepository: Repository<PaymentFrequencies>,
+		@Inject(SESSymbols.SESService)
+		private readonly sesService: SESService,
 	) {}
 
 	private parseSelectedCalculators(selectedCalculators: string): string[] {
@@ -236,9 +240,12 @@ export class SubscriptionRepositoryServiceImpl implements SubscriptionRepository
 			await this.clientRepository.save(client);
 
 			if (request.client.password && !request.client.isSso) {
-				// Send temporary password via email
-				// This is a placeholder for password handling logic
-				console.log(`Storing password for client ${client.Email} temporarily: ${request.client.password}`);
+				await this.sesService.sendTemporaryPasswordEmail({
+					toEmail: client.Email,
+					firstName: client.Firstname,
+					temporaryPassword: request.client.password,
+					templateS3Key: 'templates/temporary-password.html',
+				});
 			}
 		} catch (error) {
 			console.error('Error creating subscription and client:', error);

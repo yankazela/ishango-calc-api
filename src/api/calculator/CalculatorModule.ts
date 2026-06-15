@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ApiKeyGuardModule } from '../../shared/guards/ApiKeyGuardModule';
 import { CalculatorRepositoryModule } from '../../shared/repositories/calculator/CalculatorRepositoryModule';
 import { RepositoriesSymbols } from '../../shared/repositories/ioc';
 import { CalculatorRepositoryServiceImpl } from '../../shared/repositories/calculator/service/CalculatorRepositoryServiceImpl';
@@ -13,7 +14,7 @@ import { CapitalGainTaxServiceImpl } from './service/capital-gain/CapitalGainTax
 import { InheritanceTaxServiceImpl } from './service/inheritance-tax/InheritanceTaxServiceImpl';
 
 @Module({
-	imports: [CalculatorRepositoryModule, CountryRepositoryModule],
+	imports: [CalculatorRepositoryModule, CountryRepositoryModule, ApiKeyGuardModule],
 	controllers: [CalculatorController],
 	providers: [
 		{

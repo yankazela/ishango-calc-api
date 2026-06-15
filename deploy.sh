@@ -24,7 +24,7 @@ npm run build
 DB_NAME="${DB_NAME:-Ishango_SAAS}"
 
 echo "4. Running migration..."
-mysql -u "$DB_USER" -p"$DB_PASSWORD" -h "$DB_HOST"
+mysql -u "$DB_USERNAME" -p"$DB_PASSWORD" -h "$DB_HOST"
 use "$DB_NAME";
 source migrations/Ishango_SAAS.sql;
 

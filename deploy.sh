@@ -26,7 +26,10 @@ source ../env.sh 2>/dev/null || true
 DB_NAME="${DB_NAME:-Ishango_SAAS}"
 
 echo "4. Running migration..."
-mysql -u "$DB_USERNAME" -p"$DB_PASSWORD" -h "$DB_HOST" "$DB_NAME" < migrations/Ishango_SAAS.sql
+mysql -u "$DB_USERNAME" -p"$DB_PASSWORD" -h "$DB_HOST" "$DB_NAME" <<'SQL'
+source migrations/Ishango_SAAS.sql;
+exit
+SQL
 
 echo "5. Starting PM2 instance..."
 if pm2 describe ishango-calc-api >/dev/null 2>&1; then

@@ -17,6 +17,8 @@ npm run build
 
 . ../env.sh 2>/dev/null || true
 
+source ../env.sh 2>/dev/null || true
+
 # set -a
 # [ -f .env ] && . ./.env
 # set +a

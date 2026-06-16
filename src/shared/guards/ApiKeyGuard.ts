@@ -81,6 +81,8 @@ export class ApiKeyGuard implements CanActivate {
 			relations: ['Subscription', 'Subscription.Status'],
 		});
 
+		console.log(`API key lookup for ${apiKey}: ${keyRecord ? 'found' : 'not found or inactive'}`);
+
 		if (!keyRecord?.Subscription) {
 			const entry: CacheEntry = { isValid: false, selectedCalculators: [], expiresAt: now + NEGATIVE_CACHE_TTL_MS };
 			this.cache.set(apiKey, entry);
@@ -95,6 +97,8 @@ export class ApiKeyGuard implements CanActivate {
 			selectedCalculators: this.parseSelectedCalculators(sub.SelectedCalculators),
 			expiresAt: now + (isValid ? CACHE_TTL_MS : NEGATIVE_CACHE_TTL_MS),
 		};
+
+		console.log(`Caching API key ${apiKey}: valid=${entry.isValid}, calculators=${entry.selectedCalculators.join(',')}, expiresAt=${new Date(entry.expiresAt).toISOString()}`);
 
 		this.cache.set(apiKey, entry);
 		return entry;
